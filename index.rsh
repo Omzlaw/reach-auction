@@ -4,7 +4,7 @@ const ICreator = {
     getSale: Fun([], Object({
         nftId: Token,
         minimumBid: UInt,
-        lenInBlocks: UInt
+        lengthInBlocks: UInt
     })),
     auctionReady: Fun([], Null),
     seeBid: Fun([Address, UInt], Null),
@@ -24,6 +24,6 @@ export const main = Reach.App(() => {
         ...IBidder
     })
 
-    init()
+    init();
 
 });
