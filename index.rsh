@@ -26,4 +26,50 @@ export const main = Reach.App(() => {
 
     init();
 
+    Creator.only(() => {
+        const { nftId, minimumBid, lengthInBlocks } = declassify(interact.getSale());
+    });
+
+    Creator.publish(nftId, minimumBid, lengthInBlocks);
+    const amt = 1;
+    commit();
+
+    Creator.pay([[amt, nftId]]);
+    Creator.interact.auctionReady();
+    assert(balance(nftId) == amt, "balance of NFT is wrong");
+    const end = lastConsensusTime() + lengthInBlocks;
+    const [
+        highestBidder,
+        lastPrice,
+        isFirstBid,
+    ] = parallelReduce([Creator, minimumBid, true])
+        .invariant(balance(nftId) == amt)
+        .invariant(balance() == (isFirstBid ? 0 : lastPrice))
+        .while(lastConsensusTime() <= end)
+        .api_(Bidder.bid, (bid) => {
+            check(bid > lastPrice, "bid is too low")
+
+            return [bid, (notify) => {
+                if (!isFirstBid) {
+                    transfer(lastPrice).to(highestBidder)
+                }
+
+                const who = this;
+                Creator.interact.seeBid(who, bid);
+                return [who, bid, false]
+            }]
+        })
+        .timeout(absoluteTime(end), () => {
+            Creator.publish();
+            return [highestBidder, lastPrice, isFirstBid];
+        })
+
+    transfer(amt, nftId).to(highestBidder)
+
+    if (!isFirstBid) {
+        transfer(lastPrice).to(Creator);
+    }
+
+    Creator.interact.showOutcome(highestBidder, lastPrice);
+
 });

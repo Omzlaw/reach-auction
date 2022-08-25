@@ -15,11 +15,37 @@ const lengthInBlocks = 10;
 
 const auctionParams = { nftId, minimumBid, lengthInBlocks };
 
+let done = false;
+const bidders = [];
+const startBidders = async () => {
+    let bid = minimumBid;
+    const runBidder = async (who) => {
+        const increment = stdlib.parseCurrency(Math.random() * 10);
 
+        bid = bid.add(increment);
 
+        const acc = await stdlib.newTestAccount(startingBalance);
+        acc.setDebugLabel(who);
+        await acc.tokenAccept(nftId);
+        bidders.push([who, acc]);
+        const ctc = acc.contract(backend, ctcCreator.getInfo());
+        const getBalance = async () => {
+            return stdlib.formatCurrency(await stdlib.balanceOf(acc));
+        }
 
+        console.log(`${who} decides to bid ${stdlib.formatCurrency(bid)}`);
+        console.log(`${who} balance before is ${await getBalance()}`);
 
+        try {
+            const [lastBidder, lastBid] = await ctc.apis.Bidder.bid(who);
+            console.log(`${who} out bid ${lastBidder} who bid ${stdlib.formatCurrency(lastBid)}`);
+        } catch (error) {
+            console.log(`${who} failed to bid, because the auction is over`);
+        }
 
+        console.log(`${who} balance after is ${await getBalance()}`);
+    }
+}
 
 
 const ctcCreator = accCreator.contract(backend);
@@ -29,7 +55,7 @@ await ctcCreator.particpants.Creator({
         return auctionParams;
     },
     auctionReady: () => {
-        startBidding();
+        startBidders();
     },
     seeBid: (who, amt) => {
         console.log(`Creator saw that ${stdlib.formatAddress(who)} bidded ${stdlib.formatCurrency(amt)}`);
@@ -38,3 +64,7 @@ await ctcCreator.particpants.Creator({
         console.log(`Creator saw that ${stdlib.formatAddress(winner)} won with a bid of ${stdlib.formatCurrency(amt)}`);
     }
 });
+
+for(const [who, acc] of bidders){
+    const [amt, amtNFT] = await stdlib.b
+}
