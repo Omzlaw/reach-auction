@@ -60,7 +60,7 @@ const startBidders = async () => {
 
 
 const ctcCreator = accCreator.contract(backend);
-await ctcCreator.particpants.Creator({
+await ctcCreator.participants.Creator({
     getSale: () => {
         console.log("Setting the parameters of the sale ", auctionParams);
         return auctionParams;
