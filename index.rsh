@@ -60,6 +60,9 @@ export const main = Reach.App(() => {
                 return [who, bid, false]
             }];
         })
+        // .api_(Bidder.lastBid, () => {
+        //     return [lastPrice];
+        // })
         .timeout(absoluteTime(end), () => {
             Creator.publish();
             return [highestBidder, lastPrice, isFirstBid];
