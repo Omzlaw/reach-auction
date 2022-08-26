@@ -44,8 +44,19 @@ const startBidders = async () => {
         }
 
         console.log(`${who} balance after is ${await getBalance()}`);
+    };
+
+    await runBidder('Alice');
+    await runBidder('Bob');
+    await runBidder('Claire');
+
+    while (!done) {
+        await stdlib.wait(1);
     }
-}
+};
+
+
+
 
 
 const ctcCreator = accCreator.contract(backend);
@@ -65,6 +76,9 @@ await ctcCreator.particpants.Creator({
     }
 });
 
-for(const [who, acc] of bidders){
-    const [amt, amtNFT] = await stdlib.b
+for (const [who, acc] of bidders) {
+    const [amt, amtNFT] = await stdlib.balancesOf(acc, [null, nftId]);
+    console.log(`${who} has ${stdlib.formatCurrency(amt)} ${stdlib.standardUnit} and ${amtNFT}`);
 }
+
+done = true;

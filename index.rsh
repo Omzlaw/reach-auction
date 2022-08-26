@@ -47,9 +47,10 @@ export const main = Reach.App(() => {
         .invariant(balance() == (isFirstBid ? 0 : lastPrice))
         .while(lastConsensusTime() <= end)
         .api_(Bidder.bid, (bid) => {
-            check(bid > lastPrice, "bid is too low")
+            check(bid > lastPrice, "bid is too low");
 
             return [bid, (notify) => {
+                notify([highestBidder, lastPrice])
                 if (!isFirstBid) {
                     transfer(lastPrice).to(highestBidder)
                 }
@@ -57,7 +58,7 @@ export const main = Reach.App(() => {
                 const who = this;
                 Creator.interact.seeBid(who, bid);
                 return [who, bid, false]
-            }]
+            }];
         })
         .timeout(absoluteTime(end), () => {
             Creator.publish();
@@ -71,5 +72,7 @@ export const main = Reach.App(() => {
     }
 
     Creator.interact.showOutcome(highestBidder, lastPrice);
+    commit();
+    exit();
 
 });
