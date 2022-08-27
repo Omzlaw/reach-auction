@@ -35,7 +35,7 @@ export const main = Reach.App(() => {
     commit();
 
     Creator.pay([[amt, nftId]]);
-    Creator.interact.auctionReady();
+    // Creator.interact.auctionReady();
     assert(balance(nftId) == amt, "balance of NFT is wrong");
     const end = lastConsensusTime() + lengthInBlocks;
     const [

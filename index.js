@@ -42,11 +42,16 @@ class Creator extends React.Component {
         super(props);
         this.state = { view: 'SetMinimumBid' };
     }
-    setMinimumBid(minBid) { this.setState({ view: 'SetNFTId', minBid }); }
-    setNftId(nftId) {this.setState({view: 'SetNft', nftId}); }
+    setMinimumBid(minBid) { this.setState({ view: 'Deploy', minBid }); }
+    // setNftId(nftId) {this.setState({view: 'Deploy', nftId}); }
+    async getSale() {
+        const NFT = await reach.launchToken(this.props.acc, "Omz", "NFT", { supply: 1 });
+        const auctionParams = { nftId: NFT.id, minimumBid: Number(this.state.minBid), lengthInBlocks:100 };
+        return auctionParams;
+    }
     seeBid(who, amt) {
         const whoAmt = {who, amt};
-        {this.setState({view: 'SeeBid', whoAmt}); }
+        {this.setState({view: 'ShowOutcome', whoAmt}); }
     }
     showOutcome(winner, amt) { 
         const winnerAmt = {winner, amt}
@@ -72,7 +77,14 @@ class Bidder extends React.Component {
     attach(ctcInfoStr) {
         const ctc = this.props.acc.contract(backend, JSON.parse(ctcInfoStr));
         this.setState({ view: 'Attaching' });
-        backend._APIs(ctc, this);
+
+    }
+    async bid() { 
+      const bidValue = await new Promise(resolveBidP => {
+        this.setState({view: 'GetBid', playable: true, resolveBidP});
+      });
+      this.setState({view: 'WaitingForResults', bidValue});
+      return bidValue;
     }
     render() { return renderView(this, AttacherViews); }
 }

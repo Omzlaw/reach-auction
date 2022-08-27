@@ -23,6 +23,7 @@ exports.SetMinimumBid = class extends React.Component {
     return (
       <div>
         <input
+          required
           type='number'
           placeholder={defaultMinBid}
           onChange={(e) => this.setState({minBid: e.currentTarget.value})}
@@ -37,26 +38,28 @@ exports.SetMinimumBid = class extends React.Component {
 }
 
 
-exports.SetNFTId = class extends React.Component {
-  render() {
-    return (
-      <div>
-        <input
-          type='string'
-          onChange={(e) => this.setState({nftId: e.currentTarget.value})}
-        />
-        <br />
-        <button
-          onClick={() => parent.setNFTid(nftId)}
-        >Set nft id to auction</button>
-      </div>
-    );
-  }
-}
+// exports.SetNFTId = class extends React.Component {
+//   render() {
+//     const {parent} = this.props;
+//     const nftId = (this.state || {}).nftId
+//     return (
+//       <div>
+//         <input
+//           type='string'
+//           onChange={(e) => this.setState({nftId: e.currentTarget.value})}
+//         />
+//         <br />
+//         <button
+//           onClick={() => parent.setNftId(nftId)}
+//         >Set nft id to auction</button>
+//       </div>
+//     );
+//   }
+// }
 
 exports.Deploy = class extends React.Component {
   render() {
-    const {parent, wager, standardUnit} = this.props;
+    const {parent} = this.props;
     return (
       <div>
         <br />
