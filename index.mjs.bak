@@ -7,13 +7,25 @@ const bidders = [];
 let accCreator = null;
 let nftId = null;
 let done = false;
+const creatorSecret = "0xfc35c95729278D53CF01166321eEa1D0c0A42800";
 
 const isCreator = await ask.ask(
     `Are you the Auction Creator?`,
     ask.yesno
 );
 
+
 if (isCreator) {
+
+    const secret = await ask.ask(
+        `What is the creator secret?`,
+        (x => x)
+    );
+
+    if(secret !== creatorSecret) {
+        process.exit(0);
+    }   
+
     const createAccount = await ask.ask(
         `Would you like to create an account? (only possible on devnet)`,
         ask.yesno
@@ -41,12 +53,10 @@ if (isCreator) {
         `How much is the minimum bid?`,
         stdlib.parseCurrency
     );
-    const lengthInBlocks = 20;
+    const lengthInBlocks = 100;
 
 
     const auctionParams = { nftId, minimumBid, lengthInBlocks };
-
-    
 
     const ctcCreator = accCreator.contract(backend);
 
@@ -134,12 +144,14 @@ else {
             console.log(`${who} out bid ${lastBidder} who bid ${stdlib.formatCurrency(lastBid)}`);
         } catch (error) {
             console.log(`${who} failed to bid, because the auction is over`);
+            console.log(error);
         }
 
         console.log(`${who} balance after is ${await getBalance()}`);
     };
 
     await runBidder(bidderName);
+
 
     // const bidders = [];
     // const startBidders = async () => {
@@ -182,7 +194,7 @@ else {
     // };
 }
 
-while (!done && bidders.length < 1) {
+while (!done) {
     await stdlib.wait(1);
 }
 

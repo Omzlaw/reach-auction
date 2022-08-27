@@ -45,7 +45,7 @@ export const main = Reach.App(() => {
     ] = parallelReduce([Creator, minimumBid, true])
         .invariant(balance(nftId) == amt)
         .invariant(balance() == (isFirstBid ? 0 : lastPrice))
-        .while(lastConsensusTime() <= end)
+        .while(lastConsensusTime() <= end) 
         .api_(Bidder.bid, (bid) => {
             check(bid > lastPrice, "bid is too low");
 
@@ -66,7 +66,7 @@ export const main = Reach.App(() => {
         .timeout(absoluteTime(end), () => {
             Creator.publish();
             return [highestBidder, lastPrice, isFirstBid];
-        })
+        });
 
     transfer(amt, nftId).to(highestBidder)
 
