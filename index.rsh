@@ -13,7 +13,6 @@ const ICreator = {
 
 const IBidder = {
     bid: Fun([UInt], Tuple(Address, UInt)),
-    seeBid: Fun([Address, UInt], Null)
 }
 
 export const main = Reach.App(() => {
