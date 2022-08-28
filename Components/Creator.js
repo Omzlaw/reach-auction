@@ -19,7 +19,7 @@ class Creator extends React.Component {
     }
     setAuctionLength(lengthInBlocks) { this.setState({ view: 'Deploy', lengthInBlocks }); }
     async getSale() {
-        const {minBid, nftId, lengthInBlocks} = this.state;
+        const { minBid, nftId, lengthInBlocks } = this.state;
         const auctionParams = { nftId, minimumBid: Number(minBid), lengthInBlocks };
         return auctionParams;
     }
@@ -36,6 +36,10 @@ class Creator extends React.Component {
     }
     showOutcome(winner, amt) {
         this.setState({ view: 'ShowOutcome', winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
+    }
+    restart() {
+        this.setState(null);
+        this.setState({ view: 'SetMinimumBid' });
     }
 
     render() { return renderView(this, CreatorViews); }

@@ -186,12 +186,16 @@ exports.SeeBid = class extends React.Component {
 
 exports.ShowOutcome = class extends React.Component {
   render() {
-    const { winner, amt } = this.props;
+    const { winner, amt, parent } = this.props;
     return (
       <div>
         Auction has ended
         <br />
         {winner} won with a bid of {amt}
+        <br />
+        <button
+          onClick={(e) => parent.restart()}
+        >Restart</button>
       </div>
     );
   }

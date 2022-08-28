@@ -50,6 +50,8 @@ class Bidder extends React.Component {
                     })
             } else {
                 const amt = await this.getBalance();
+                // const amtNFT = await this.getNFTBalance(this.state.nftId);
+                // console.log(amtNFT);
                 this.setState({ view: 'Error', amt, standardUnit });
             }
 
@@ -57,6 +59,9 @@ class Bidder extends React.Component {
     }
     async getBalance() {
         return reach.formatCurrency(await reach.balanceOf(this.props.acc));
+    }
+    async getNFTBalance(nftId) {
+        return await reach.balanceOf(nftId);
     }
     render() { return renderView(this, AttacherViews); }
 }
