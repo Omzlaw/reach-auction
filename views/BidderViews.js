@@ -60,10 +60,12 @@ exports.Done = class extends React.Component {
 
 exports.Error = class extends React.Component {
   render() {
-    const { error } = this.props;
+    const { amt, standardUnit } = this.props;
     return (
       <div>
         You failed to bid, because the auction is over
+        <br/>
+        {`You have ${amt} ${standardUnit}`}
       </div>
     );
   }

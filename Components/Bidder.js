@@ -14,6 +14,7 @@ class Bidder extends React.Component {
     async attach(ctcInfoStr, nftId) {
         const { acc } = this.props;
         await acc.tokenAccept(nftId);
+        this.setState({nftId});
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
         this.setState({ view: 'Attaching' });
         this.setState({ view: 'PlaceBid', standardUnit, ctc })
@@ -48,7 +49,8 @@ class Bidder extends React.Component {
                         latestBalance
                     })
             } else {
-                this.setState({ view: 'Error', error });
+                const amt = await this.getBalance();
+                this.setState({ view: 'Error', amt, standardUnit });
             }
 
         }
