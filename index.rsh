@@ -58,7 +58,7 @@ export const main = Reach.App(() => {
 
                 const who = this;
                 Creator.interact.seeBid(who, bid);
-                return [who, bid, false]
+                return [who, bid, false];
             }];
         })
         .timeout(absoluteTime(end), () => {
