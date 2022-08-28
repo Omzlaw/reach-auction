@@ -8,6 +8,7 @@ const exports = {};
 exports.PlaceBid = class extends React.Component {
   render() {
     const {
+      error,
       standardUnit,
       ctc,
       parent,
@@ -35,6 +36,8 @@ exports.PlaceBid = class extends React.Component {
           onChange={(e) => this.setState({ bidPlaced: e.currentTarget.value })}
         /> {standardUnit}
         <br />
+        {error ? 'Bid too low, please try again' : ''}
+        <br />
         <button
           onClick={() => parent.placeBid(ctc, bidPlaced)}
         >Place bid</button>
@@ -61,8 +64,6 @@ exports.Error = class extends React.Component {
     return (
       <div>
         You failed to bid, because the auction is over
-        <br />
-        {`${error.message}`}
       </div>
     );
   }

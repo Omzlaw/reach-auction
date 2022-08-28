@@ -12,19 +12,22 @@ class Bidder extends React.Component {
         this.state = { view: 'Attach' };
     }
     async attach(ctcInfoStr, nftId) {
-        const {acc} = this.props;
+        const { acc } = this.props;
         await acc.tokenAccept(nftId);
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
         this.setState({ view: 'Attaching' });
         this.setState({ view: 'PlaceBid', standardUnit, ctc })
     }
     async placeBid(ctc, bid) {
+        let previousBalance = 0;
+        let latestBalance = 0;
         try {
-            const previousBalance = await this.getBalance();
+            previousBalance = await this.getBalance();
             const [lastBidder, lastBid] = await ctc.apis.Bidder.bid(bid);
-            const latestBalance = await this.getBalance();
+            latestBalance = await this.getBalance();
             this.setState(
                 {
+                    error: null,
                     view: 'PlaceBid',
                     standardUnit,
                     ctc,
@@ -34,8 +37,20 @@ class Bidder extends React.Component {
                     latestBalance
                 })
         } catch (error) {
-            this.setState({ view: 'Error', error });
-            console.log(error);
+            if (error.message.includes("bid is too low")) {
+                this.setState(
+                    {
+                        error,
+                        view: 'PlaceBid',
+                        standardUnit,
+                        ctc,
+                        previousBalance,
+                        latestBalance
+                    })
+            } else {
+                this.setState({ view: 'Error', error });
+            }
+
         }
     }
     async getBalance() {

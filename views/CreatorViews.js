@@ -17,6 +17,14 @@ exports.Wrapper = class extends React.Component {
 }
 
 exports.SetMinimumBid = class extends React.Component {
+
+  onSetMinimumBid(parent, minBid) {
+    if (minBid < 1 || minBid == null) {
+      alert('Minimum bid too low, Please try with a higher value (1 and above)');
+    } else {
+      parent.setMinimumBid(minBid);
+    }
+  }
   render() {
     const { parent, defaultMinBid, standardUnit } = this.props;
     const minBid = (this.state || {}).minBid || defaultMinBid;
@@ -30,7 +38,7 @@ exports.SetMinimumBid = class extends React.Component {
         /> {standardUnit}
         <br />
         <button
-          onClick={() => parent.setMinimumBid(minBid)}
+          onClick={() => { this.onSetMinimumBid(parent, minBid) }}
         >Set minimum bid</button>
       </div>
     );
@@ -64,6 +72,13 @@ exports.SetNft = class extends React.Component {
 }
 
 exports.SetAuctionLength = class extends React.Component {
+  onSetAuctionLength(parent, lengthInBlocks) {
+    if (lengthInBlocks < 1 || lengthInBlocks == null) {
+      alert('Length too low, Please try with a higher value (1 and above)');
+    } else {
+      parent.setAuctionLength(lengthInBlocks);
+    }
+  }
   render() {
     const { parent } = this.props;
     const lengthInBlocks = (this.state || {}).lengthInBlocks
@@ -77,7 +92,7 @@ exports.SetAuctionLength = class extends React.Component {
         />
         <br />
         <button
-          onClick={() => parent.setAuctionLength(lengthInBlocks)}
+          onClick={() => { this.onSetAuctionLength(parent, lengthInBlocks) }}
         >Save</button>
       </div>
     );
@@ -172,11 +187,13 @@ exports.SeeBid = class extends React.Component {
 exports.ShowOutcome = class extends React.Component {
   render() {
     const { winner, amt } = this.props;
-    <div>
-      Auction has ended
-      <br />
-      {winner} won with a bid of {amt}
-    </div>
+    return (
+      <div>
+        Auction has ended
+        <br />
+        {winner} won with a bid of {amt}
+      </div>
+    );
   }
 }
 

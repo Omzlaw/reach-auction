@@ -62,6 +62,15 @@ exports.ConnectAccount = class extends React.Component {
 }
 
 exports.FundAccount = class extends React.Component {
+
+  onFundAccount(parent, amt) {
+    if(amt < 1 || amt == null) {
+     alert('Amount too low, Please try with a higher value (1 and above)');
+    } else {
+      parent.fundAccount(amt);
+    }
+  }
+
   render() {
     const { bal, standardUnit, defaultFundAmt, parent } = this.props;
     const amt = (this.state || {}).amt || defaultFundAmt;
@@ -80,7 +89,7 @@ exports.FundAccount = class extends React.Component {
           placeholder={defaultFundAmt}
           onChange={(e) => this.setState({ amt: e.currentTarget.value })}
         />
-        <button onClick={() => parent.fundAccount(amt)}>Fund Account</button>
+        <button onClick={() => { this.onFundAccount(parent, amt) }}>Fund Account</button>
         <button onClick={() => parent.skipFundAccount()}>Skip</button>
       </div>
     );

@@ -13,6 +13,7 @@ const ICreator = {
 
 const IBidder = {
     bid: Fun([UInt], Tuple(Address, UInt)),
+    seeBid: Fun([Address, UInt], Null),
     showOutcome: Fun([Address, UInt], Null)
 }
 
@@ -61,9 +62,6 @@ export const main = Reach.App(() => {
                 return [who, bid, false]
             }];
         })
-        // .api_(Bidder.lastBid, () => {
-        //     return [lastPrice];
-        // })
         .timeout(absoluteTime(end), () => {
             Creator.publish();
             return [highestBidder, lastPrice, isFirstBid];
