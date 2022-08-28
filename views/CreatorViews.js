@@ -6,7 +6,7 @@ const sleep = (milliseconds) => new Promise(resolve => setTimeout(resolve, milli
 
 exports.Wrapper = class extends React.Component {
   render() {
-    const {content} = this.props;
+    const { content } = this.props;
     return (
       <div className="Creator">
         <h2>Creator</h2>
@@ -18,7 +18,7 @@ exports.Wrapper = class extends React.Component {
 
 exports.SetMinimumBid = class extends React.Component {
   render() {
-    const {parent, defaultMinBid, standardUnit} = this.props;
+    const { parent, defaultMinBid, standardUnit } = this.props;
     const minBid = (this.state || {}).minBid || defaultMinBid;
     return (
       <div>
@@ -26,7 +26,7 @@ exports.SetMinimumBid = class extends React.Component {
           required
           type='number'
           placeholder={defaultMinBid}
-          onChange={(e) => this.setState({minBid: e.currentTarget.value})}
+          onChange={(e) => this.setState({ minBid: e.currentTarget.value })}
         /> {standardUnit}
         <br />
         <button
@@ -38,28 +38,55 @@ exports.SetMinimumBid = class extends React.Component {
 }
 
 
-// exports.SetNFTId = class extends React.Component {
-//   render() {
-//     const {parent} = this.props;
-//     const nftId = (this.state || {}).nftId
-//     return (
-//       <div>
-//         <input
-//           type='string'
-//           onChange={(e) => this.setState({nftId: e.currentTarget.value})}
-//         />
-//         <br />
-//         <button
-//           onClick={() => parent.setNftId(nftId)}
-//         >Set nft id to auction</button>
-//       </div>
-//     );
-//   }
-// }
+exports.SetNft = class extends React.Component {
+  render() {
+    const { parent } = this.props;
+    const nftId = (this.state || {}).nftId
+    return (
+      <div>
+        Set nft id to auction
+        <br />
+        <input
+          type='text'
+          onChange={(e) => this.setState({ nftId: e.currentTarget.value })}
+        />
+        <br />
+        <button
+          onClick={() => parent.setNFT(nftId)}
+        >Save</button>
+        <br />
+        OR
+        <br />
+        <button onClick={() => parent.setDemoNFT()}>Use demo NFT</button>
+      </div>
+    );
+  }
+}
+
+exports.SetAuctionLength = class extends React.Component {
+  render() {
+    const { parent } = this.props;
+    const lengthInBlocks = (this.state || {}).lengthInBlocks
+    return (
+      <div>
+        Set Auction length in blocks
+        <br />
+        <input
+          type='number'
+          onChange={(e) => this.setState({ lengthInBlocks: e.currentTarget.value })}
+        />
+        <br />
+        <button
+          onClick={() => parent.setAuctionLength(lengthInBlocks)}
+        >Save</button>
+      </div>
+    );
+  }
+}
 
 exports.Deploy = class extends React.Component {
   render() {
-    const {parent} = this.props;
+    const { parent } = this.props;
     return (
       <div>
         <br />
@@ -80,9 +107,9 @@ exports.Deploying = class extends React.Component {
 }
 
 exports.WaitingForBidders = class extends React.Component {
-  async copyToClipboard(button) {
-    const {ctcInfoStr} = this.props;
-    navigator.clipboard.writeText(ctcInfoStr);
+
+  async copyToClipboard(button, value) {
+    navigator.clipboard.writeText(value);
     const origInnerHTML = button.innerHTML;
     button.innerHTML = 'Copied!';
     button.disabled = true;
@@ -90,21 +117,66 @@ exports.WaitingForBidders = class extends React.Component {
     button.innerHTML = origInnerHTML;
     button.disabled = false;
   }
+  async copyContractInfoToClipboard(button) {
+    const { ctcInfoStr } = this.props;
+    this.copyToClipboard(button, ctcInfoStr);
+  }
+
+  async copyNFTIdToClipboard(button) {
+    const { nftId } = this.props;
+    this.copyToClipboard(button, nftId);
+  }
 
   render() {
-    const {ctcInfoStr} = this.props;
+    const { ctcInfoStr, nftId } = this.props;
     return (
       <div>
         Waiting for Bidders to join...
         <br /> Please give them this contract info:
-        <pre className='ContractInfo'>
+        <pre className=''>
           {ctcInfoStr}
         </pre>
         <button
-          onClick={(e) => this.copyToClipboard(e.currentTarget)}
+          onClick={(e) => this.copyContractInfoToClipboard(e.currentTarget)}
         >Copy to clipboard</button>
+        <br />
+        <br />
+        And also the NFT id
+        <pre className=''>
+          {nftId}
+        </pre>
+        <button
+          onClick={(e) => this.copyNFTIdToClipboard(e.currentTarget)}
+        >Copy to clipboard</button>
+        <br />
+
       </div>
     )
+  }
+}
+
+exports.SeeBid = class extends React.Component {
+  render() {
+    const { who, amt } = this.props;
+    return (
+      <div>
+        Bidding in progress
+        <br />
+        {who} decided to bid {amt}
+      </div>
+    );
+  }
+}
+
+
+exports.ShowOutcome = class extends React.Component {
+  render() {
+    const { winner, amt } = this.props;
+    <div>
+      Auction has ended
+      <br />
+      {winner} won with a bid of {amt}
+    </div>
   }
 }
 

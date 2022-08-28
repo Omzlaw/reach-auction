@@ -18,7 +18,7 @@ exports.Wrapper = class extends React.Component {
 exports.Attach = class extends React.Component {
   render() {
     const {parent} = this.props;
-    const {ctcInfoStr} = this.state || {};
+    const {ctcInfoStr, nftId} = this.state || {};
     return (
       <div>
         Please paste the contract info to attach to:
@@ -26,13 +26,22 @@ exports.Attach = class extends React.Component {
         <textarea spellCheck="false"
           className='ContractInfo'
           onChange={(e) => this.setState({ctcInfoStr: e.currentTarget.value})}
-          placeholder='{}'
+          placeholder=''
+        />
+        <br />
+        Please paste the NFT id to accept:
+        <br />
+        <textarea spellCheck="false"
+          className='ContractInfo'
+          onChange={(e) => this.setState({nftId: e.currentTarget.value})}
+          placeholder=''
         />
         <br />
         <button
-          disabled={!ctcInfoStr}
-          onClick={() => parent.attach(ctcInfoStr)}
+          disabled={!ctcInfoStr && nftId}
+          onClick={() => parent.attach(ctcInfoStr, nftId)}
         >Attach</button>
+        <br />
       </div>
     );
   }

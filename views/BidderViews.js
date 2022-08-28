@@ -5,37 +5,39 @@ const exports = {};
 // Player views must be extended.
 // It does not have its own Wrapper view.
 
-exports.Bid = class extends React.Component {
+exports.PlaceBid = class extends React.Component {
   render() {
-    const {parent, playable, hand} = this.props;
+    const {
+      standardUnit,
+      ctc,
+      parent,
+      lastBid,
+      bid,
+      previousBalance,
+      latestBalance
+    } = this.props;
+    const bidPlaced = (this.state || {}).bidPlaced;
     return (
       <div>
-        {hand ? 'It was a draw! Pick again.' : ''}
+        Balance before: {previousBalance ? previousBalance : ''} {standardUnit}
         <br />
-        {!playable ? 'Please wait...' : ''}
+        Balance after: {latestBalance ? latestBalance : ''} {standardUnit}
+        <br />
+        Please place your bid
+        <br />
+        {lastBid ? `You out bid the last bid of ${lastBid} ${standardUnit}` : ''}
+        <br />
+        {bid ? `With a bid of ${bid} ${standardUnit}` : ''}
+        <br />
+        <input
+          required
+          type='number'
+          onChange={(e) => this.setState({ bidPlaced: e.currentTarget.value })}
+        /> {standardUnit}
         <br />
         <button
-          disabled={!playable}
-          onClick={() => parent.playHand('ROCK')}
-        >Rock</button>
-        <button
-          disabled={!playable}
-          onClick={() => parent.playHand('PAPER')}
-        >Paper</button>
-        <button
-          disabled={!playable}
-          onClick={() => parent.playHand('SCISSORS')}
-        >Scissors</button>
-      </div>
-    );
-  }
-}
-
-exports.WaitingForResults = class extends React.Component {
-  render() {
-    return (
-      <div>
-        Waiting for results...
+          onClick={() => parent.placeBid(ctc, bidPlaced)}
+        >Place bid</button>
       </div>
     );
   }
@@ -43,7 +45,7 @@ exports.WaitingForResults = class extends React.Component {
 
 exports.Done = class extends React.Component {
   render() {
-    const {outcome} = this.props;
+    const { outcome } = this.props;
     return (
       <div>
         Thank you for playing. The outcome of this game was:
@@ -53,11 +55,14 @@ exports.Done = class extends React.Component {
   }
 }
 
-exports.Timeout = class extends React.Component {
+exports.Error = class extends React.Component {
   render() {
+    const { error } = this.props;
     return (
       <div>
-        There's been a timeout. (Someone took too long.)
+        You failed to bid, because the auction is over
+        <br />
+        {`${error.message}`}
       </div>
     );
   }

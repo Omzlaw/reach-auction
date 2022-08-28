@@ -4,13 +4,47 @@ const exports = {};
 
 exports.Wrapper = class extends React.Component {
   render() {
-    const {content} = this.props;
+    const { content } = this.props;
     return (
       <div className="App">
         <header className="App-header" id="root">
           <h1>NFT Auction</h1>
           {content}
         </header>
+      </div>
+    );
+  }
+}
+
+exports.Welcome = class extends React.Component {
+  render() {
+    const { parent } = this.props;
+    return (
+      <div>
+        Welcome to the NFT Auction app!!!
+        <br />
+        Would you like to create an account?
+        <br />
+        <button onClick={() => parent.createTestAccount()}>Yes</button>
+        <button onClick={() => parent.typeAccountSecret()}>No</button>
+      </div>
+    );
+  }
+}
+
+exports.TypeAccountSecret = class extends React.Component {
+  render() {
+    const secret = (this.state || {}).secret;
+    const { parent } = this.props;
+    return (
+      <div>
+        Type account secret
+        <br />
+        <input
+          onChange={(e) => this.setState({ secret: e.currentTarget.value })}
+        />
+        <br />
+        <button onClick={() => parent.createAccountFromSecret(secret)}>Link</button>
       </div>
     );
   }
@@ -29,7 +63,7 @@ exports.ConnectAccount = class extends React.Component {
 
 exports.FundAccount = class extends React.Component {
   render() {
-    const {bal, standardUnit, defaultFundAmt, parent} = this.props;
+    const { bal, standardUnit, defaultFundAmt, parent } = this.props;
     const amt = (this.state || {}).amt || defaultFundAmt;
     return (
       <div>
@@ -44,7 +78,7 @@ exports.FundAccount = class extends React.Component {
         <input
           type='number'
           placeholder={defaultFundAmt}
-          onChange={(e) => this.setState({amt: e.currentTarget.value})}
+          onChange={(e) => this.setState({ amt: e.currentTarget.value })}
         />
         <button onClick={() => parent.fundAccount(amt)}>Fund Account</button>
         <button onClick={() => parent.skipFundAccount()}>Skip</button>
@@ -53,9 +87,10 @@ exports.FundAccount = class extends React.Component {
   }
 }
 
+
 exports.CreatorOrBidder = class extends React.Component {
   render() {
-    const {parent} = this.props;
+    const { parent } = this.props;
     return (
       <div>
         Please select a role:
