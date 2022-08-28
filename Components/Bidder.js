@@ -13,7 +13,7 @@ class Bidder extends React.Component {
     }
     async attach(ctcInfoStr, nftId) {
         const { acc } = this.props;
-        await acc.tokenAccept(nftId);
+        await acc.tokenAccept(JSON.parse(nftId));
         this.setState({nftId});
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
         this.setState({ view: 'Attaching' });
