@@ -2,8 +2,21 @@ import React from 'react';
 
 const exports = {};
 
+const sleep = (milliseconds) => new Promise(resolve => setTimeout(resolve, milliseconds));
 
-exports.SetNft = class extends React.Component {
+exports.Wrapper = class extends React.Component {
+    render() {
+      const { content } = this.props;
+      return (
+        <div className="Owner">
+          <h2>Owner</h2>
+          {content}
+        </div>
+      );
+    }
+  }
+
+exports.SetNFT = class extends React.Component {
     render() {
         const { parent } = this.props;
         const nftId = (this.state || {}).nftId
@@ -17,7 +30,7 @@ exports.SetNft = class extends React.Component {
                 />
                 <br />
                 <button
-                    onClick={() => parent.setNFT(nftId)}
+                    onClick={() => parent.setMyNFT(nftId)}
                 >Save</button>
                 <br />
                 OR
@@ -102,12 +115,12 @@ exports.WaitingForAuctionToStart = class extends React.Component {
 
 exports.SeeBid = class extends React.Component {
     render() {
-        const { who, amt } = this.props;
+        const { who, amt, standardUnit } = this.props;
         return (
             <div>
                 Bidding in progress
                 <br />
-                {who} decided to bid {amt}
+                {who} decided to bid {amt} {standardUnit}
             </div>
         );
     }
@@ -116,12 +129,12 @@ exports.SeeBid = class extends React.Component {
 
 exports.ShowOutcome = class extends React.Component {
     render() {
-        const { winner, amt, parent } = this.props;
+        const { winner, amt, standardUnit, parent } = this.props;
         return (
             <div>
                 Auction has ended
                 <br />
-                {winner} won with a bid of {amt}
+                {winner} won with a bid of {amt} {standardUnit}
                 <br />
                 <button
                     onClick={(e) => parent.restart()}

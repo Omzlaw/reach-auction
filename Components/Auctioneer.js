@@ -15,21 +15,24 @@ class Auctioneer extends React.Component {
         const { acc } = this.props;
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
         this.setState({ view: 'Attaching' });
-        backend.Auctioneer(ctc, this);
-        this.setState({ view: 'SetMinimumBid', standardUnit, ctc })
+        this.setState({ view: 'SetMinimumBid', standardUnit, ctc });
     }
     setMinimumBid(minBid) { this.setState({ view: 'SetAuctionLength', minBid }); }
-    setAuctionLength(lengthInBlocks) { this.setState({ view: 'WaitingForBidders', lengthInBlocks }); }
+    setAuctionLength(lengthInBlocks) { 
+        this.setState({ view: 'StartingAuction', lengthInBlocks }); 
+        backend.Auctioneer(this.state.ctc, this);
+    }
     async startAuction() {
         const { minBid, lengthInBlocks } = this.state;
-        const auctionParams = { minimumBid: Number(minBid), lengthInBlocks };
+        const auctionParams = { minimumAmount: Number(minBid), lengthInBlocks };
+        this.setState({ view: 'WaitingForBidders' });
         return auctionParams;
     }
     seeBid(who, amt) {
-        { this.setState({ view: 'SeeBid', who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
+        { this.setState({ view: 'SeeBid', standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
     }
     showOutcome(winner, amt) {
-        this.setState({ view: 'ShowOutcome', winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
+        this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
     }
 
     render() { return renderView(this, AuctioneerViews); }

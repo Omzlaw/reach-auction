@@ -9,12 +9,16 @@ const { standardUnit } = reach;
 class Owner extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { view: 'SetNft' };
+        this.state = { view: 'SetNFT' };
     }
-    setNFT(nftId) { this.setState({ view: 'Deploy', nftId }); }
+    setMyNFT(nftId) { this.setState({ view: 'Deploy', nftId }); }
     async setDemoNFT() {
         const NFT = await reach.launchToken(this.props.acc, "Omz", "NFT", { supply: 1 });
-        this.setState({ view: 'Deploy', nftId: NFT.id, lengthInBlocks: 50 })
+        this.setState({ view: 'Deploy', nftId: NFT.id })
+    }
+    async setNFT() {
+        const nftId = this.state.nftId;
+        return { nftId };
     }
     async deploy() {
         const ctc = this.props.acc.contract(backend);
@@ -25,14 +29,14 @@ class Owner extends React.Component {
         this.setState({ view: 'WaitingForAuctionToStart', ctcInfoStr, nftId });
     }
     seeBid(who, amt) {
-        { this.setState({ view: 'SeeBid', who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
+        { this.setState({ view: 'SeeBid', standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
     }
     showOutcome(winner, amt) {
-        this.setState({ view: 'ShowOutcome', winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
+        this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
     }
     restart() {
         this.setState(null);
-        this.setState({ view: 'SetNft' });
+        this.setState({ view: 'SetNFT' });
     }
 
     render() { return renderView(this, OwnerViews); }

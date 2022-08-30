@@ -2,8 +2,6 @@ import React from 'react';
 
 const exports = {};
 
-const sleep = (milliseconds) => new Promise(resolve => setTimeout(resolve, milliseconds));
-
 exports.Wrapper = class extends React.Component {
   render() {
     const { content } = this.props;
@@ -116,6 +114,16 @@ exports.SetAuctionLength = class extends React.Component {
   }
 }
 
+exports.StartingAuction = class extends React.Component {
+  render() {
+    return (
+      <div>
+        Starting Auction...
+      </div>
+    );
+  }
+}
+
 
 exports.WaitingForBidders = class extends React.Component {
 
@@ -125,6 +133,37 @@ exports.WaitingForBidders = class extends React.Component {
         Waiting for Bidders to join...
       </div>
     )
+  }
+}
+
+exports.SeeBid = class extends React.Component {
+  render() {
+      const { who, amt, standardUnit } = this.props;
+      return (
+          <div>
+              Bidding in progress
+              <br />
+              {who} decided to bid {amt} {standardUnit}
+          </div>
+      );
+  }
+}
+
+
+exports.ShowOutcome = class extends React.Component {
+  render() {
+      const { winner, amt, standardUnit, parent } = this.props;
+      return (
+          <div>
+              Auction has ended
+              <br />
+              {winner} won with a bid of {amt} {standardUnit}
+              <br />
+              <button
+                  onClick={(e) => parent.restart()}
+              >Restart</button>
+          </div>
+      );
   }
 }
 

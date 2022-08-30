@@ -119,7 +119,7 @@ exports.OwnerAuctioneerOrBidder = class extends React.Component {
         <p>
           <button
             onClick={() => parent.selectBidder()}
-          >Attacher</button>
+          >Bidder</button>
           <br /> Attach to the Creator's contract.
         </p>
       </div>

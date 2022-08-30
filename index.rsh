@@ -40,11 +40,8 @@ export const main = Reach.App(() => {
         const { minimumAmount, lengthInBlocks } = declassify(interact.startAuction());
     });
 
-    Auctioneer.only(() => {
-        const { minBid } = declassify(interact.setMinBid());
-    });
 
-    Auctioneer.publish(minimumAmount, lengthInBlocks, minBid);
+    Auctioneer.publish(minimumAmount, lengthInBlocks);
     const amt = minimumAmount;
     commit();
 
@@ -55,7 +52,7 @@ export const main = Reach.App(() => {
         highestBidder,
         lastPrice,
         isFirstBid,
-    ] = parallelReduce([Auctioneer, minBid, true])
+    ] = parallelReduce([Auctioneer, minimumAmount, true])
         .invariant(balance(nftId) == amt)
         .invariant(balance() == (isFirstBid ? 0 : lastPrice))
         .while(lastConsensusTime() <= end)

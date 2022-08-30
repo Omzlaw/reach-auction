@@ -38,6 +38,7 @@ class Bidder extends React.Component {
                     latestBalance
                 })
         } catch (error) {
+            console.log(error);
             if (error.message.includes("bid is too low")) {
                 this.setState(
                     {
