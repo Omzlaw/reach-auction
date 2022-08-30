@@ -1,6 +1,7 @@
 import React from 'react';
-import Creator from './Components/Creator';
+import Auctioneer from './Components/Auctioneer';
 import Bidder from './Components/Bidder';
+import Owner from './Components/Owner';
 import AppViews from './views/AppViews';
 import { renderDOM, renderView } from './views/render';
 import './index.css';
@@ -22,7 +23,7 @@ class App extends React.Component {
         if (await reach.canFundFromFaucet()) {
             this.setState({ view: 'FundAccount' });
         } else {
-            this.setState({ view: 'CreatorOrBidder' });
+            this.setState({ view: 'OwnerAuctioneerOrBidder' });
         }
     }
     async createTestAccount() {
@@ -38,10 +39,11 @@ class App extends React.Component {
     }
     async fundAccount(fundAmount) {
         await reach.fundFromFaucet(this.state.acc, reach.parseCurrency(fundAmount));
-        this.setState({ view: 'CreatorOrBidder' });
+        this.setState({ view: 'OwnerAuctioneerOrBidder' });
     }
-    async skipFundAccount() { this.setState({ view: 'CreatorOrBidder' }); }
-    selectCreator() { this.setState({ view: 'Wrapper', ContentView: Creator }); }
+    async skipFundAccount() { this.setState({ view: 'OwnerAuctioneerOrBidder' }); }
+    selectOwner() { this.setState({ view: 'Wrapper', ContentView: Owner }); }
+    selectAuctioneer() { this.setState({ view: 'Wrapper', ContentView: Auctioneer }); }
     selectBidder() { this.setState({ view: 'Wrapper', ContentView: Bidder }); }
     render() { return renderView(this, AppViews); }
 }

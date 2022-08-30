@@ -3,7 +3,7 @@
 
 export const main = Reach.App(() => {
 
-    const NFTOwner = Participant('NFTOwner', {
+    const Owner = Participant('Owner', {
         setNFT: Fun([], Object({
             nftId: Token
         })),
@@ -24,18 +24,16 @@ export const main = Reach.App(() => {
     });
 
     const Bidder = API('Bidder', {
-        bid: Fun([UInt], Tuple(Address, UInt)),
-        seeBid: Fun([Address, UInt], Null),
-        showOutcome: Fun([Address, UInt], Null)
+        bid: Fun([UInt], Tuple(Address, UInt))
     })
 
     init();
 
-    NFTOwner.only(() => {
+    Owner.only(() => {
         const { nftId } = declassify(interact.setNFT());
     });
 
-    NFTOwner.publish(nftId);
+    Owner.publish(nftId);
     commit();
 
     Auctioneer.only(() => {
@@ -50,7 +48,7 @@ export const main = Reach.App(() => {
     const amt = minimumAmount;
     commit();
 
-    Auctioneer.pay([[amt, nftId]]);
+    Owner.pay([[amt, nftId]]);
     assert(balance(nftId) == amt, "balance of NFT is wrong");
     const end = lastConsensusTime() + lengthInBlocks;
     const [
@@ -71,7 +69,7 @@ export const main = Reach.App(() => {
                 }
 
                 const who = this;
-                each([Auctioneer, NFTOwner], () => {
+                each([Auctioneer, Owner], () => {
                     interact.seeBid(who, bid);
                 });
                 
@@ -86,10 +84,10 @@ export const main = Reach.App(() => {
     transfer(amt, nftId).to(highestBidder)
 
     if (!isFirstBid) {
-        transfer(lastPrice).to(Auctioneer);
+        transfer(lastPrice).to(Owner);
     }
 
-    each([Auctioneer, NFTOwner], () => {
+    each([Auctioneer, Owner], () => {
         interact.showOutcome(highestBidder, lastPrice);
     });
     commit();

@@ -64,8 +64,8 @@ exports.ConnectAccount = class extends React.Component {
 exports.FundAccount = class extends React.Component {
 
   onFundAccount(parent, amt) {
-    if(amt < 1 || amt == null) {
-     alert('Amount too low, Please try with a higher value (1 and above)');
+    if (amt < 1 || amt == null) {
+      alert('Amount too low, Please try with a higher value (1 and above)');
     } else {
       parent.fundAccount(amt);
     }
@@ -97,7 +97,7 @@ exports.FundAccount = class extends React.Component {
 }
 
 
-exports.CreatorOrBidder = class extends React.Component {
+exports.OwnerAuctioneerOrBidder = class extends React.Component {
   render() {
     const { parent } = this.props;
     return (
@@ -106,9 +106,15 @@ exports.CreatorOrBidder = class extends React.Component {
         <br />
         <p>
           <button
-            onClick={() => parent.selectCreator()}
-          >Creator</button>
-          <br /> Set the minimum bid, NFT, deploy the contract.
+            onClick={() => parent.selectOwner()}
+          >Owner</button>
+          <br /> Set NFT.
+        </p>
+        <p>
+          <button
+            onClick={() => parent.selectAuctioneer()}
+          >Auctioneer</button>
+          <br /> Set the minimum bid, deploy the contract.
         </p>
         <p>
           <button
