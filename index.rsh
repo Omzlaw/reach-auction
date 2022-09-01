@@ -69,10 +69,7 @@ export const main = Reach.App(() => {
                         each([Owner, Auctioneer], () => {
                             interact.seeBid(this, bid);
                         });
-                        
-                        highestBidder = this;
-                        lastPrice = bid;
-                        isFirstBid = false;
+
                     }];
                 }
             )
@@ -81,8 +78,8 @@ export const main = Reach.App(() => {
                 commit();
                 Auctioneer.publish();
                 commit();
-                exit();
             });
+
         continue;
     }
 
