@@ -1,30 +1,5 @@
 'reach 0.1'
 
-const winner = (bidJane, bidJohn) => {
-    var highestBidder = null;
-    var lastPrice = 0;
-    if (johnBid > janeBid) {
-        highestBidder = John;
-        lastPrice = johnBid;
-    } else if (janeBid > johnBid) {
-        highestBidder = Jane;
-        lastPrice = janeBid;
-    }
-
-    return [highestBidder, lastPrice, false];
-}
-
-const IShared = {
-    showOutcome: Fun([Address, UInt], Null),
-    informTimeout: Fun([], Null),
-}
-
-const IBidder = {
-    enterAuction: Fun([UInt], Null),
-    bid: Fun([UInt], Tuple(Address, UInt)),
-    ...IShared
-}
-
 export const main = Reach.App(() => {
 
     const Owner = Participant('Owner', {
@@ -32,7 +7,7 @@ export const main = Reach.App(() => {
             nftId: Token
         })),
         seeBid: Fun([Address, UInt], Null),
-        ...IShared
+        showOutcome: Fun([Address, UInt], Null)
     });
 
     const Auctioneer = Participant('Auctioneer', {
@@ -44,24 +19,14 @@ export const main = Reach.App(() => {
             minBid: UInt
         })),
         seeBid: Fun([Address, UInt], Null),
-        ...IShared
+        showOutcome: Fun([Address, UInt], Null)
     });
 
-    const Jane = API('Jane', {
-        ...IBidder
-    });
-
-    const John = API('John', {
-        ...IBidder
-    });
+    const Bidder = API('Bidder', {
+        bid: Fun([UInt], Tuple(Address, UInt))
+    })
 
     init();
-
-    const informTimeout = () => {
-        each([Owner, Auctioneer, Jane, John], () => {
-            interact.informTimeout();
-        });
-    };
 
     Owner.only(() => {
         const { nftId } = declassify(interact.setNFT());
@@ -79,66 +44,55 @@ export const main = Reach.App(() => {
     const amt = minimumAmount;
     commit();
 
-    each([Jane, John], () => {
-        interact.enterAuction();
-    });
-
     Owner.pay([[amt, nftId]]);
     assert(balance(nftId) == amt, "balance of NFT is wrong");
-    const end = lastConsensusTime() + lengthInBlocks;
-    var lastPrice = minimumAmount;
-    var isFirstBid = true;
-    var highestBidder = null;
-    invariant(balance(nftId) == amt)
-    invariant(balance() == (isFirstBid ? 0 : lastPrice))
-    while (lastConsensusTime() <= end) {
-        commit();
+    const [timeRemaining, keepGoing] = makeDeadline(lengthInBlocks);
 
-        Jane.only(() => {
-            const janeBid = interact.bid();
-            check(janeBid < lastPrice, "bid is too low");
-        });
-        Jane.publish(janeBid)
-            .timeout(absoluteTime(end), () => {
-                informTimeout
-                return [highestBidder, lastPrice, isFirstBid];
+    var [highestBidder, lastPrice, isFirstBid] = [Auctioneer, minimumAmount, true];
+
+    invariant(balance(nftId) == amt);
+    invariant(balance() == (isFirstBid ? 0 : lastPrice));
+
+    while (keepGoing()) {
+        commit();
+        fork()
+            .api_(Bidder.bid,
+                (bid) => {
+                    check(bid > lastPrice, "bid is too low");
+
+                    return [bid, (notify) => {
+                        notify([highestBidder, lastPrice])
+                        if (!isFirstBid) {
+                            transfer(lastPrice).to(highestBidder)
+                        }
+
+                        each([Owner, Auctioneer], () => {
+                            interact.seeBid(this, bid);
+                        });
+                        
+                        highestBidder = this;
+                        lastPrice = bid;
+                        isFirstBid = false;
+                    }];
+                }
+            )
+            .timeout(timeRemaining(), () => {
+                Owner.publish();
+                commit();
+                Auctioneer.publish();
+                commit();
+                exit();
             });
-        commit();
-        each([Auctioneer, Owner], () => {
-            interact.seeBid(Jane, janeBid);
-        });
-
-        John.only(() => {
-            const johnBid = interact.bid();
-            check(johnBid < lastPrice, "bid is too low");
-        });
-        John.publish(johnBid)
-            .timeout(absoluteTime(end), () => {
-                informTimeout
-                return [highestBidder, lastPrice, isFirstBid];
-            });
-        commit();
-        each([Auctioneer, Owner], () => {
-            interact.seeBid(John, johnBid);
-        });
-
-        const bidOutcome = winner(bidJane, bidJohn);
-        [highestBidder, lastPrice, isFirstBid] = bidOutcome;
-
-        if (!isFirstBid) {
-            transfer(lastPrice).to(highestBidder)
-        }
-
         continue;
     }
 
-    transfer(amt, nftId).to(highestBidder)
+    transfer(amt, nftId).to(highestBidder);
 
     if (!isFirstBid) {
         transfer(lastPrice).to(Owner);
     }
 
-    each([Auctioneer, Owner, Jane, John], () => {
+    each([Auctioneer, Owner], () => {
         interact.showOutcome(highestBidder, lastPrice);
     });
     commit();

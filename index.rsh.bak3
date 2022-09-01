@@ -1,0 +1,126 @@
+'reach 0.1'
+
+const IShared = {
+    showOutcome: Fun([Address, UInt], Null),
+    seeBid: Fun([Address, UInt], Null)
+}
+
+const IBidder = {
+    enterAuction: Fun([UInt, Token], Null),
+    bid: Fun([], UInt),
+    ...IShared
+}
+
+export const main = Reach.App(() => {
+
+    const Owner = Participant('Owner', {
+        setNFT: Fun([], Object({
+            nftId: Token
+        })),
+        ...IShared
+    });
+
+    const Auctioneer = Participant('Auctioneer', {
+        startAuction: Fun([], Object({
+            minimumAmount: UInt,
+            lengthInBlocks: UInt
+        })),
+        setMinBid: Fun([], Object({
+            minBid: UInt
+        })),
+        ...IShared
+    });
+
+    const Jane = Participant('Jane', {
+        ...IBidder
+    });
+
+    const John = Participant('John', {
+        ...IBidder
+    });
+
+    init();
+
+    Owner.only(() => {
+        const { nftId } = declassify(interact.setNFT());
+    });
+
+    Owner.publish(nftId);
+    commit();
+
+    Auctioneer.only(() => {
+        const { minimumAmount, lengthInBlocks } = declassify(interact.startAuction());
+    });
+
+
+    Auctioneer.publish(minimumAmount, lengthInBlocks);
+    const amt = minimumAmount;
+    commit();
+
+    each([Jane, John], () => {
+        interact.enterAuction(amt, nftId);
+    });
+
+    Owner.pay([[amt, nftId]]);
+    assert(balance(nftId) == amt, "balance of NFT is wrong");
+    const [timeRemaining, keepGoing] = makeDeadline(lengthInBlocks);
+
+    var [highestBidder, lastPrice, isFirstBid] = [Auctioneer, minimumAmount, true];
+
+    invariant(balance(nftId) == amt);
+    invariant(balance() == (isFirstBid ? 0 : lastPrice));
+
+    while (keepGoing()) {
+        fork()
+            .case(Jane, (() => ({
+                msg: lastPrice,
+                when: declassify(interact.bid())
+            })),
+                ((bid) => bid),
+                (bid) => {
+                    require(bid > lastPrice);
+
+                    if (!isFirstBid) {
+                        transfer(lastPrice).to(highestBidder);
+                    }
+                    [highestBidder, lastPrice, isFirstBid] = [this, bid, false];
+                    commit();
+                    exit();
+                })
+            .case(John, (() => ({
+                msg: lastPrice,
+                when: declassify(interact.bid())
+            })),
+                ((bid) => bid),
+                (bid) => {
+                    require(bid > lastPrice);
+
+                    if (!isFirstBid) {
+                        transfer(lastPrice).to(highestBidder);
+                    }
+                    [highestBidder, lastPrice, isFirstBid] = [this, bid, false];
+                    commit();
+                    exit();
+                })
+            .timeout(timeRemaining(), () => {
+                Owner.publish();
+                commit();
+                Auctioneer.publish();
+                return [highestBidder, lastPrice, isFirstBid];
+            });
+
+    }
+
+    transfer(amt, nftId).to(highestBidder)
+
+    if (!isFirstBid) {
+        transfer(lastPrice).to(Owner);
+    }
+
+    each([Auctioneer, Owner, Jane, John], () => {
+        interact.showOutcome(highestBidder, lastPrice);
+    });
+    commit();
+    exit();
+
+});
