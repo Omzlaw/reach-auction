@@ -50,10 +50,10 @@ class Bidder extends React.Component {
                         latestBalance
                     })
             } else {
-                const amt = await this.getBalance();
-                // const [amt, amtNFT] = await this.getNFTBalance(this.state.nftId);
+                // const amt = await this.getBalance();
+                const [amt, amtNFT] = await this.getNFTBalance(this.state.nftId);
                 // console.log(amtNFT);
-                this.setState({ view: 'Error', amt, standardUnit });
+                this.setState({ view: 'Error', amt, standardUnit, amtNFT });
             }
 
         }

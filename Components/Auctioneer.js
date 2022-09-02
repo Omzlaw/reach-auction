@@ -34,6 +34,10 @@ class Auctioneer extends React.Component {
     showOutcome(winner, amt) {
         this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
     }
+    restart() {
+        this.setState(null);
+        this.setState({ view: 'Attach' });
+    }
 
     render() { return renderView(this, AuctioneerViews); }
 }
