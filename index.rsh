@@ -70,15 +70,13 @@ export const main = Reach.App(() => {
                             interact.seeBid(this, bid);
                         });
 
+                        [highestBidder, lastPrice, isFirstBid] = [this, bid, false];
+
+
                     }];
                 }
-            )
-            .timeout(timeRemaining(), () => {
-                Owner.publish();
-                commit();
-                Auctioneer.publish();
-                commit();
-            });
+            );
+
 
         continue;
     }
