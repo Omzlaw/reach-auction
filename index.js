@@ -9,7 +9,7 @@ import { loadStdlib } from '@reach-sh/stdlib';
 const reach = loadStdlib(process.env);
 
 const { standardUnit } = reach;
-const defaults = { defaultFundAmt: '1', defaultMinBid: 1, standardUnit };
+const defaults = { defaultFundAmt: '1', defaultMinPrice: 1, standardUnit };
 
 class App extends React.Component {
     constructor(props) {

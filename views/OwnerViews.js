@@ -6,15 +6,15 @@ const sleep = (milliseconds) => new Promise(resolve => setTimeout(resolve, milli
 
 exports.Wrapper = class extends React.Component {
     render() {
-      const { content } = this.props;
-      return (
-        <div className="Owner">
-          <h2>Owner</h2>
-          {content}
-        </div>
-      );
+        const { content } = this.props;
+        return (
+            <div className="Owner">
+                <h2>Owner</h2>
+                {content}
+            </div>
+        );
     }
-  }
+}
 
 exports.SetNFT = class extends React.Component {
     render() {
@@ -129,12 +129,14 @@ exports.SeeBid = class extends React.Component {
 
 exports.ShowOutcome = class extends React.Component {
     render() {
-        const { winner, amt, standardUnit, parent } = this.props;
+        const { winner, amt, standardUnit, parent, balance, amtNFT } = this.props;
         return (
             <div>
                 Auction has ended
                 <br />
                 {winner} won with a bid of {amt} {standardUnit}
+                <br />
+                {`You have ${balance} ${standardUnit} and ${amtNFT} NFT`}
                 <br />
                 <button
                     onClick={(e) => parent.restart()}

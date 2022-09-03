@@ -12,11 +12,8 @@ export const main = Reach.App(() => {
 
     const Auctioneer = Participant('Auctioneer', {
         startAuction: Fun([], Object({
-            minimumAmount: UInt,
+            minPrice: UInt,
             lengthInBlocks: UInt
-        })),
-        setMinBid: Fun([], Object({
-            minBid: UInt
         })),
         seeBid: Fun([Address, UInt], Null),
         showOutcome: Fun([Address, UInt], Null)
@@ -36,21 +33,21 @@ export const main = Reach.App(() => {
     commit();
 
     Auctioneer.only(() => {
-        const { minimumAmount, lengthInBlocks } = declassify(interact.startAuction());
+        const { minPrice, lengthInBlocks } = declassify(interact.startAuction());
     });
 
 
-    Auctioneer.publish(minimumAmount, lengthInBlocks);
-    const amt = minimumAmount;
+    Auctioneer.publish(minPrice, lengthInBlocks);
+    const nftAmt = 1;
     commit();
 
-    Owner.pay([[amt, nftId]]);
-    assert(balance(nftId) == amt, "balance of NFT is wrong");
+    Owner.pay([[nftAmt, nftId]]);
+    assert(balance(nftId) == nftAmt, "balance of NFT is wrong");
     const [timeRemaining, keepGoing] = makeDeadline(lengthInBlocks);
 
-    var [highestBidder, lastPrice, isFirstBid] = [Auctioneer, minimumAmount, true];
+    var [highestBidder, lastPrice, isFirstBid] = [Auctioneer, minPrice, true];
 
-    invariant(balance(nftId) == amt);
+    invariant(balance(nftId) == nftAmt);
     invariant(balance() == (isFirstBid ? 0 : lastPrice));
 
     while (keepGoing()) {
@@ -61,7 +58,8 @@ export const main = Reach.App(() => {
                     check(bid > lastPrice, "bid is too low");
 
                     return [bid, (notify) => {
-                        notify([highestBidder, lastPrice])
+                        notify([highestBidder, lastPrice]);
+
                         if (!isFirstBid) {
                             transfer(lastPrice).to(highestBidder)
                         }
@@ -83,7 +81,7 @@ export const main = Reach.App(() => {
     commit();
     Owner.publish();
 
-    transfer(amt, nftId).to(highestBidder);
+    transfer(nftAmt, nftId).to(highestBidder);
 
     if (!isFirstBid) {
         transfer(lastPrice).to(Owner);

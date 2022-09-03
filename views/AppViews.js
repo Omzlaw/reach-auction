@@ -88,7 +88,7 @@ exports.FundAccount = class extends React.Component {
           type='number'
           placeholder={defaultFundAmt}
           onChange={(e) => this.setState({ amt: e.currentTarget.value })}
-        />
+        /> micro {standardUnit}
         <button onClick={() => { this.onFundAccount(parent, amt) }}>Fund Account</button>
         <button onClick={() => parent.skipFundAccount()}>Skip</button>
       </div>
@@ -114,7 +114,7 @@ exports.OwnerAuctioneerOrBidder = class extends React.Component {
           <button
             onClick={() => parent.selectAuctioneer()}
           >Auctioneer</button>
-          <br /> Set the minimum bid, deploy the contract.
+          <br /> Set the minimum price, deploy the contract.
         </p>
         <p>
           <button

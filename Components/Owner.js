@@ -31,8 +31,16 @@ class Owner extends React.Component {
     seeBid(who, amt) {
         { this.setState({ view: 'SeeBid', standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
     }
-    showOutcome(winner, amt) {
-        this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
+    async showOutcome(winner, amt) {
+        const balance = await this.getBalance();
+        const amtNFT = await this.getNFTBalance(this.state.nftId);
+        this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt), balance, amtNFT });
+    }
+    async getBalance() {
+        return reach.formatCurrency(await reach.balanceOf(this.props.acc));
+    }
+    async getNFTBalance(nftId) {
+        return await this.props.acc.balanceOf(JSON.parse(nftId));
     }
     restart() {
         this.setState(null);

@@ -15,7 +15,8 @@ exports.PlaceBid = class extends React.Component {
       lastBid,
       bid,
       previousBalance,
-      latestBalance
+      latestBalance,
+      lastBidder
     } = this.props;
     const bidPlaced = (this.state || {}).bidPlaced;
     return (
@@ -28,13 +29,15 @@ exports.PlaceBid = class extends React.Component {
         <br />
         {lastBid ? `You out bid the last bid of ${lastBid} ${standardUnit}` : ''}
         <br />
+        {lastBid ? `from ${lastBidder}` : ''}
+        <br />
         {bid ? `With a bid of ${bid} ${standardUnit}` : ''}
         <br />
         <input
           required
           type='number'
           onChange={(e) => this.setState({ bidPlaced: e.currentTarget.value })}
-        /> {standardUnit}
+        /> micro {standardUnit}
         <br />
         {error ? 'Bid too low, please try again.' : ''}
         <br />

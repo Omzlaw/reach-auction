@@ -36,7 +36,8 @@ class Bidder extends React.Component {
                     lastBid: reach.formatCurrency(lastBid),
                     bid: reach.formatCurrency(bid),
                     previousBalance,
-                    latestBalance
+                    latestBalance,
+                    lastBidder: reach.formatAddress(lastBidder)
                 })
         } catch (error) {
             console.log(error);

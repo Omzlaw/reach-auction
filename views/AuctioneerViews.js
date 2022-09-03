@@ -56,30 +56,30 @@ exports.Attaching = class extends React.Component {
   }
 }
 
-exports.SetMinimumBid = class extends React.Component {
+exports.SetMinimumPrice = class extends React.Component {
 
-  onSetMinimumBid(parent, minBid) {
-    if (minBid < 1 || minBid == null) {
-      alert('Minimum bid too low, Please try with a higher value (1 and above)');
+  onSetMinimumPrice(parent, minPrice) {
+    if (minPrice < 1 || minPrice == null) {
+      alert('Minimum price too low, Please try with a higher value (1 and above)');
     } else {
-      parent.setMinimumBid(minBid);
+      parent.setMinimumPrice(minPrice);
     }
   }
   render() {
-    const { parent, defaultMinBid, standardUnit } = this.props;
-    const minBid = (this.state || {}).minBid || defaultMinBid;
+    const { parent, defaultMinPrice, standardUnit } = this.props;
+    const minPrice = (this.state || {}).minPrice || defaultMinPrice;
     return (
       <div>
         <input
           required
           type='number'
-          placeholder={defaultMinBid}
+          placeholder={defaultMinPrice}
           onChange={(e) => this.setState({ minBid: e.currentTarget.value })}
-        /> {standardUnit}
+        /> micro {standardUnit}
         <br />
         <button
-          onClick={() => { this.onSetMinimumBid(parent, minBid) }}
-        >Set minimum bid</button>
+          onClick={() => { this.onSetMinimumPrice(parent, minPrice) }}
+        >Set minimum price</button>
       </div>
     );
   }
