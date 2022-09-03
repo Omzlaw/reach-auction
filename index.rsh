@@ -83,8 +83,12 @@ export const main = Reach.App(() => {
 
     transfer(nftAmt, nftId).to(highestBidder);
 
+    const auctioneerFee = div(mul(lastPrice, 1), 100);
+    const ownerMoney = sub(lastPrice, auctioneerFee);
+
     if (!isFirstBid) {
-        transfer(lastPrice).to(Owner);
+        transfer(ownerMoney).to(Owner);
+        transfer(auctioneerFee).to(Auctioneer);
     }
 
     each([Auctioneer, Owner], () => {
