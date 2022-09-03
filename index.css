@@ -1,3 +1,4 @@
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -33,10 +34,22 @@ body {
   input[type=number] {
     font-size: calc(10px + 2vmin);
     width: 4em;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  input[type=text] {
+    font-size: calc(10px + 2vmin);
+    width: 4em;
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
   }
   
   button {
     font-size: calc(10px + 2vmin);
+    margin: 4px;
+    margin-top: 20px;
   }
   
   textarea {

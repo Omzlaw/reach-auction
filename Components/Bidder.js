@@ -13,8 +13,9 @@ class Bidder extends React.Component {
     }
     async attach(ctcInfoStr, nftId) {
         const { acc } = this.props;
-        await acc.tokenAccept(JSON.parse(nftId));
-        this.setState({nftId});
+        const jsonNFTId = JSON.parse(nftId);
+        await acc.tokenAccept(jsonNFTId);
+        this.setState({nftId: jsonNFTId});
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
         this.setState({ view: 'Attaching' });
         this.setState({ view: 'PlaceBid', standardUnit, ctc })
@@ -50,9 +51,8 @@ class Bidder extends React.Component {
                         latestBalance
                     })
             } else {
-                // const amt = await this.getBalance();
-                const [amt, amtNFT] = await this.getNFTBalance(this.state.nftId);
-                // console.log(amtNFT);
+                const amt = await this.getBalance();
+                const amtNFT = await this.getNFTBalance(this.state.nftId);
                 this.setState({ view: 'Error', amt, standardUnit, amtNFT });
             }
 
@@ -62,7 +62,7 @@ class Bidder extends React.Component {
         return reach.formatCurrency(await reach.balanceOf(this.props.acc));
     }
     async getNFTBalance(nftId) {
-        return await reach.balancesOf(this.props.acc, [null, nftId]);
+        return await this.props.acc.balanceOf(nftId);
     }
     render() { return renderView(this, AttacherViews); }
 }

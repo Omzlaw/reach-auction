@@ -7,7 +7,7 @@ exports.Wrapper = class extends React.Component {
     const { content } = this.props;
     return (
       <div className="App">
-        <header className="App-header" id="root">
+        <header className="text-xl App-header" id="root">
           <h1>NFT Auction</h1>
           {content}
         </header>

@@ -77,9 +77,11 @@ export const main = Reach.App(() => {
                 }
             );
 
-
         continue;
     }
+
+    commit();
+    Owner.publish();
 
     transfer(amt, nftId).to(highestBidder);
 
