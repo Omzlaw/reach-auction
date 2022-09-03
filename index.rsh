@@ -13,6 +13,7 @@ export const main = Reach.App(() => {
     const Auctioneer = Participant('Auctioneer', {
         startAuction: Fun([], Object({
             minPrice: UInt,
+            minBidDiff: UInt,
             lengthInBlocks: UInt
         })),
         seeBid: Fun([Address, UInt], Null),
@@ -33,11 +34,11 @@ export const main = Reach.App(() => {
     commit();
 
     Auctioneer.only(() => {
-        const { minPrice, lengthInBlocks } = declassify(interact.startAuction());
+        const { minPrice, minBidDiff, lengthInBlocks } = declassify(interact.startAuction());
     });
 
 
-    Auctioneer.publish(minPrice, lengthInBlocks);
+    Auctioneer.publish(minPrice, minBidDiff, lengthInBlocks);
     const nftAmt = 1;
     commit();
 
@@ -56,6 +57,7 @@ export const main = Reach.App(() => {
             .api_(Bidder.bid,
                 (bid) => {
                     check(bid > lastPrice, "bid is too low");
+                    check(sub(bid, lastPrice) >= minBidDiff, "bid difference is too low");
 
                     return [bid, (notify) => {
                         notify([highestBidder, lastPrice]);

@@ -74,12 +74,41 @@ exports.SetMinimumPrice = class extends React.Component {
           required
           type='number'
           placeholder={defaultMinPrice}
-          onChange={(e) => this.setState({ minBid: e.currentTarget.value })}
+          onChange={(e) => this.setState({ minPrice: e.currentTarget.value })}
         /> micro {standardUnit}
         <br />
         <button
           onClick={() => { this.onSetMinimumPrice(parent, minPrice) }}
         >Set minimum price</button>
+      </div>
+    );
+  }
+}
+
+exports.SetMinimumBidDiff = class extends React.Component {
+
+  onSetMinimumBidDiff(parent, minBidDiff) {
+    if (minBidDiff < 1 || minBidDiff == null) {
+      alert('Minimum bid value too low, Please try with a higher value (1 and above)');
+    } else {
+      parent.setMinimumBidDiff(minBidDiff);
+    }
+  }
+  render() {
+    const { parent, defaultMinBidDiff, standardUnit } = this.props;
+    const minBidDiff = (this.state || {}).minBidDiff || defaultMinBidDiff;
+    return (
+      <div>
+        <input
+          required
+          type='number'
+          placeholder={defaultMinBidDiff}
+          onChange={(e) => this.setState({ minBidDiff: e.currentTarget.value })}
+        /> micro {standardUnit}
+        <br />
+        <button
+          onClick={() => { this.onSetMinimumBidDiff(parent, minBidDiff) }}
+        >Set minimum bid difference</button>
       </div>
     );
   }

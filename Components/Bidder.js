@@ -41,7 +41,7 @@ class Bidder extends React.Component {
                 })
         } catch (error) {
             console.log(error);
-            if (error.message.includes("bid is too low")) {
+            if (error.message.includes("is too low")) {
                 this.setState(
                     {
                         error,

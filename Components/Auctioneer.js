@@ -17,14 +17,15 @@ class Auctioneer extends React.Component {
         this.setState({ view: 'Attaching' });
         this.setState({ view: 'SetMinimumPrice', standardUnit, ctc });
     }
-    setMinimumPrice(minPrice) { this.setState({ view: 'SetAuctionLength', minPrice }); }
+    setMinimumPrice(minPrice) { this.setState({ view: 'SetMinimumBidDiff', minPrice }); }
+    setMinimumBidDiff(minBidDiff) { this.setState({ view: 'SetAuctionLength', minBidDiff }); }
     setAuctionLength(lengthInBlocks) { 
         this.setState({ view: 'StartingAuction', lengthInBlocks }); 
         backend.Auctioneer(this.state.ctc, this);
     }
     async startAuction() {
-        const { minPrice, lengthInBlocks } = this.state;
-        const auctionParams = { minPrice: Number(minPrice), lengthInBlocks };
+        const { minPrice, minBidDiff, lengthInBlocks } = this.state;
+        const auctionParams = { minPrice: Number(minPrice), minBidDiff: Number(minBidDiff), lengthInBlocks };
         this.setState({ view: 'WaitingForBidders' });
         return auctionParams;
     }

@@ -39,7 +39,7 @@ exports.PlaceBid = class extends React.Component {
           onChange={(e) => this.setState({ bidPlaced: e.currentTarget.value })}
         /> micro {standardUnit}
         <br />
-        {error ? 'Bid too low, please try again.' : ''}
+        {error ? 'Bid or bid difference is too low, please try again.' : ''}
         <br />
         <button
           onClick={() => parent.placeBid(ctc, bidPlaced)}
