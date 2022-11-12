@@ -49,22 +49,18 @@ const defaults = { defaultFundAmt: '1', defaultMinPrice: 1, standardUnit };
 // }
 
 
-const App = () => {
+const App = (props) => {
 
-    const [view, setView] = useState('Welcome');
-    const [ContentView, setContentView] = useState(null);
-    const [acc, setAcc] = useState(null);
-    const [bal, setBal] = useState(null);
+    const [state, setState] = useState({ view: "Welcome", ...defaults });
 
     const createAccount = async (acc) => {
         const balAtomic = await reach.balanceOf(acc);
         const bal = reach.formatCurrency(balAtomic, 4);
-        setAcc(acc);
-        setBal(bal);
+        setState({ ...state, acc, bal });
         if (await reach.canFundFromFaucet()) {
-            setView('FundAccount');
+            setState({ ...state, view: "FundAccount" });
         } else {
-            setView('OwnerAuctioneerOrBidder');
+            setState({ ...state, view: "OwnerAuctioneerOrBidder" });
         }
     }
     const createTestAccount = async () => {
@@ -72,7 +68,7 @@ const App = () => {
         createAccount(acc);
     }
     const typeAccountSecret = async () => {
-        setView('TypeAccountSecret')
+        setState({ ...state, view: "TypeAccountSecret" });
     }
     const createAccountFromSecret = async (secret) => {
         const acc = await reach.newAccountFromSecret(secret);
@@ -80,33 +76,24 @@ const App = () => {
     }
     const fundAccount = async (fundAmount) => {
         await reach.fundFromFaucet(acc, reach.parseCurrency(fundAmount));
-        setView('OwnerAuctioneerOrBidder')
+        setState({ ...state, view: "OwnerAuctioneerOrBidder" });
     }
     const skipFundAccount = async () => {
-        setView('OwnerAuctioneerOrBidder')
+        setState({ ...state, view: "OwnerAuctioneerOrBidder" });
     }
     const selectOwner = () => {
-        setView('Wrapper');
-        setContentView(Owner);
+        setState({ ...state, view: "Wrapper", ContentView: Owner });
     }
     const selectAuctioneer = () => {
-        setView('Wrapper');
-        setContentView(Auctioneer);
+        setState({ ...state, view: "Wrapper", ContentView: Auctioneer });
     }
     const selectBidder = () => {
-        setView('Wrapper');
-        setContentView(Bidder);
+        setState({ ...state, view: "Wrapper", ContentView: Bidder });
     }
 
     const parent = {
-        state: {
-            view,
-            acc,
-            bal,
-            ContentView,
-            ...defaults
-        },
-        props: {},
+        state,
+        props: props,
         createTestAccount,
         typeAccountSecret,
         createAccountFromSecret,
@@ -117,7 +104,11 @@ const App = () => {
         selectBidder
     }
 
-    return renderView(parent, AppViews);
+    return (
+        <div>
+            {renderView(parent, AppViews)}
+        </div>
+    )
 }
 
 renderDOM(<App />);
