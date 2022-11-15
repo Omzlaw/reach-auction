@@ -1,84 +1,34 @@
 import React, { useState } from 'react';
-import AttacherViews from '../views/AttacherViews';
-import { renderView } from '../views/render';
+import { Wrapper, Attach, Attaching } from '../views/AttacherViews';
+import { PlaceBid, Error } from '../views/BidderViews';
 import * as backend from '../build/index.main.mjs';
 import { loadStdlib } from '@reach-sh/stdlib';
 const reach = loadStdlib(process.env);
 const { standardUnit } = reach;
 
-// class Bidder extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = { view: 'Attach' };
-//     }
-//     async attach(ctcInfoStr, nftId) {
-//         const { acc } = this.props;
-//         const jsonNFTId = JSON.parse(nftId);
-//         await acc.tokenAccept(jsonNFTId);
-//         this.setState({nftId: jsonNFTId});
-//         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
-//         this.setState({ view: 'Attaching' });
-//         this.setState({ view: 'PlaceBid', standardUnit, ctc })
-//     }
-//     async placeBid(ctc, bid) {
-//         let previousBalance = 0;
-//         let latestBalance = 0;
-//         try {
-//             previousBalance = await this.getBalance();
-//             const [lastBidder, lastBid] = await ctc.apis.Bidder.bid(bid);
-//             latestBalance = await this.getBalance();
-//             this.setState(
-//                 {
-//                     error: null,
-//                     view: 'PlaceBid',
-//                     standardUnit,
-//                     ctc,
-//                     lastBid: reach.formatCurrency(lastBid),
-//                     bid: reach.formatCurrency(bid),
-//                     previousBalance,
-//                     latestBalance,
-//                     lastBidder: reach.formatAddress(lastBidder)
-//                 })
-//         } catch (error) {
-//             console.log(error);
-//             if (error.message.includes("is too low")) {
-//                 this.setState(
-//                     {
-//                         error,
-//                         view: 'PlaceBid',
-//                         standardUnit,
-//                         ctc,
-//                         previousBalance,
-//                         latestBalance
-//                     })
-//             } else {
-//                 const amt = await this.getBalance();
-//                 const amtNFT = await this.getNFTBalance(this.state.nftId);
-//                 this.setState({ view: 'Error', amt, standardUnit, amtNFT });
-//             }
-
-//         }
-//     }
-//     async getBalance() {
-//         return reach.formatCurrency(await reach.balanceOf(this.props.acc));
-//     }
-//     async getNFTBalance(nftId) {
-//         return await this.props.acc.balanceOf(nftId);
-//     }
-//     render() { return renderView(this, AttacherViews); }
-// }
-
 const Bidder = (props) => {
-    const [state, setState] = useState({ view: "Attach" });
+    const { acc } = props;
+    const [view, setView] = useState("Attach");
+    const [nftId, setNFTID] = useState(null);
+    const [amt, setAmt] = useState(null);
+    const [amtNFT, setAmtNFT] = useState(null);
+    const [error, setError] = useState(null);
+    const [lastBid, setLastBid] = useState(null);
+    const [bid, setBid] = useState(null);
+    const [ctc, setCtc] = useState(null);
+    const [previousBalance, setPreviousBalance] = useState(null);
+    const [latestBalance, setLatestBalance] = useState(null);
+    const [lastBidder, setLastBidder] = useState(null);
 
     const attach = async (ctcInfoStr, nftId) => {
         const { acc } = props;
         const jsonNFTId = JSON.parse(nftId);
         await acc.tokenAccept(jsonNFTId);
-        setState({ ...state, nftId: jsonNFTId });
+        setNFTID(jsonNFTId);
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
-        setState({ ...state, view: 'Attaching' });
-        setState({ ...state, view: 'PlaceBid', standardUnit, ctc })
+        setView("Attaching");
+        setView("PlaceBid");
+        setCtc(ctc);
     }
 
     const placeBid = async (ctc, bid) => {
@@ -88,62 +38,63 @@ const Bidder = (props) => {
             previousBalance = await getBalance();
             const [lastBidder, lastBid] = await ctc.apis.Bidder.bid(bid);
             latestBalance = await getBalance();
-            setState(
-                {
-                    ...state,
-                    error: null,
-                    view: 'PlaceBid',
-                    standardUnit,
-                    ctc,
-                    lastBid: reach.formatCurrency(lastBid),
-                    bid: reach.formatCurrency(bid),
-                    previousBalance,
-                    latestBalance,
-                    lastBidder: reach.formatAddress(lastBidder)
-                })
+            setError(null);
+            setView("PlaceBid");
+            setCtc(ctc);
+            setLastBid(reach.formatCurrency(lastBid));
+            setBid(reach.formatCurrency(bid));
+            setPreviousBalance(previousBalance);
+            setLatestBalance(latestBalance);
+            setLastBidder(reach.formatAddress(lastBidder));
         } catch (error) {
-            console.log(error);
             if (error.message.includes("is too low")) {
-                setState(
-                    {
-                        ...state,
-                        error,
-                        view: 'PlaceBid',
-                        standardUnit,
-                        ctc,
-                        previousBalance,
-                        latestBalance
-                    })
+                setError(error);
+                setView("PlaceBid");
+                setCtc(ctc);
+                setPreviousBalance(previousBalance);
+                setLatestBalance(latestBalance);
             } else {
                 const amt = await getBalance();
-                const amtNFT = await getNFTBalance(state.nftId);
-                setState({ ...state, view: 'Error', amt, standardUnit, amtNFT });
+                const amtNFT = await getNFTBalance(nftId);
+                setView("Error");
+                setAmt(amt);
+                setAmtNFT(amtNFT);
             }
 
         }
     }
+
     const getBalance = async () => {
-        return reach.formatCurrency(await reach.balanceOf(props.acc));
+        return reach.formatCurrency(await reach.balanceOf(acc));
     }
     const getNFTBalance = async (nftId) => {
-        return await props.acc.balanceOf(nftId);
+        return await acc.balanceOf(nftId);
     }
 
-    const parent = {
-        state,
-        props: props,
-        attach,
-        placeBid,
-        getBalance,
-        getNFTBalance
+    switch (view) {
+        case 'Attach':
+            return <Wrapper content={<Attach parent={{ attach }} />} />
+        case 'Attaching':
+            return <Wrapper content={<Attaching />} />
+        case 'PlaceBid':
+            return <Wrapper content={<PlaceBid
+                error={error}
+                standardUnit={standardUnit}
+                ctc={ctc}
+                parent={{ placeBid }}
+                lastBid={lastBid}
+                bid={bid}
+                previousBalance={previousBalance}
+                latestBalance={latestBalance}
+                lastBidder={lastBidder}
+            />} />
+        case 'Error':
+            return <Wrapper content={<Error amt={amt} standardUnit={standardUnit} amtNFT={amtNFT} />} />
+        default:
+            return (
+                <div></div>
+            );
     }
-
-
-    return (
-        <div>
-            {renderView(parent, AttacherViews)}
-        </div>
-    )
 }
 
 export default Bidder;

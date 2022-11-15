@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
-const exports = {};
-
-exports.Wrapper = (props) => {
+export const Wrapper = (props) => {
   const { content } = props;
   return (
     <div className="App">
@@ -14,7 +12,7 @@ exports.Wrapper = (props) => {
   );
 }
 
-exports.Welcome = (props) => {
+export const Welcome = (props) => {
   const { parent } = props;
   return (
     <div>
@@ -28,7 +26,7 @@ exports.Welcome = (props) => {
   );
 }
 
-exports.TypeAccountSecret = (props) => {
+export const TypeAccountSecret = (props) => {
   const [state, setState] = useState(null);
   const secret = (state || {}).secret;
   const { parent } = props;
@@ -45,7 +43,7 @@ exports.TypeAccountSecret = (props) => {
   );
 }
 
-exports.ConnectAccount = () => {
+export const ConnectAccount = () => {
   return (
     <div>
       Please wait while we connect to your account.
@@ -54,7 +52,7 @@ exports.ConnectAccount = () => {
   )
 }
 
-exports.FundAccount = (props) => {
+export const FundAccount = (props) => {
 
   const [state, setState] = useState(null);
   const { bal, standardUnit, defaultFundAmt, parent } = props;
@@ -91,7 +89,7 @@ exports.FundAccount = (props) => {
 }
 
 
-exports.OwnerAuctioneerOrBidder = (props) => {
+export const OwnerAuctioneerOrBidder = (props) => {
   const { parent } = props;
   return (
     <div>
@@ -118,5 +116,3 @@ exports.OwnerAuctioneerOrBidder = (props) => {
     </div>
   );
 }
-
-export default exports;

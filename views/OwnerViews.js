@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-const exports = {};
 
 const sleep = (milliseconds) => new Promise(resolve => setTimeout(resolve, milliseconds));
 
-exports.Wrapper = (props) => {
+export const Wrapper = (props) => {
     const { content } = props;
     return (
         <div className="Owner">
@@ -14,7 +13,7 @@ exports.Wrapper = (props) => {
     );
 }
 
-exports.SetNFT = (props) => {
+export const SetNFT = (props) => {
     const [state, setState] = useState();
     const { parent } = props;
     const nftId = (state || {}).nftId
@@ -38,7 +37,7 @@ exports.SetNFT = (props) => {
     );
 }
 
-exports.Deploy = (props) => {
+export const Deploy = (props) => {
     const { parent } = props;
     return (
         <div>
@@ -50,14 +49,14 @@ exports.Deploy = (props) => {
     );
 }
 
-exports.Deploying = () => {
+export const Deploying = () => {
     return (
         <div>Deploying... please wait.</div>
     );
 }
 
 
-exports.WaitingForAuctionToStart = (props) => {
+export const WaitingForAuctionToStart = (props) => {
 
     const copyToClipboard = async (button, value) => {
         navigator.clipboard.writeText(value);
@@ -104,7 +103,7 @@ exports.WaitingForAuctionToStart = (props) => {
     )
 }
 
-exports.SeeBid = (props) => {
+export const SeeBid = (props) => {
     const { who, amt, standardUnit } = props;
     return (
         <div>
@@ -116,7 +115,7 @@ exports.SeeBid = (props) => {
 }
 
 
-exports.ShowOutcome = (props) => {
+export const ShowOutcome = (props) => {
     const { winner, amt, standardUnit, parent, balance, amtNFT } = props;
     return (
         <div>
@@ -132,5 +131,3 @@ exports.ShowOutcome = (props) => {
         </div>
     );
 }
-
-export default exports;

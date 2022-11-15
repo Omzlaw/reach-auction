@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Auctioneer from './Components/Auctioneer';
 import Bidder from './Components/Bidder';
 import Owner from './Components/Owner';
-import AppViews from './views/AppViews';
-import { renderDOM, renderView } from './views/render';
+import { Wrapper, Welcome, TypeAccountSecret, FundAccount, OwnerAuctioneerOrBidder } from './views/AppViews';
+import { renderDOM } from './views/render';
 import './index.css';
 import { loadStdlib } from '@reach-sh/stdlib';
 const reach = loadStdlib(process.env);
@@ -11,56 +11,22 @@ const reach = loadStdlib(process.env);
 const { standardUnit } = reach;
 const defaults = { defaultFundAmt: '1', defaultMinPrice: 1, standardUnit };
 
-// class App extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = { view: 'Welcome', ...defaults };
-//     }
-//     async createAccount(acc) {
-//         const balAtomic = await reach.balanceOf(acc);
-//         const bal = reach.formatCurrency(balAtomic, 4);
-//         this.setState({ acc, bal });
-//         if (await reach.canFundFromFaucet()) {
-//             this.setState({ view: 'FundAccount' });
-//         } else {
-//             this.setState({ view: 'OwnerAuctioneerOrBidder' });
-//         }
-//     }
-//     async createTestAccount() {
-//         const acc = await reach.newTestAccount(reach.parseCurrency(1));
-//         this.createAccount(acc);
-//     }
-//     async typeAccountSecret() {
-//         this.setState({ view: 'TypeAccountSecret' });
-//     }
-//     async createAccountFromSecret(secret) {
-//         const acc = await reach.newAccountFromSecret(secret);
-//         this.createAccount(acc);
-//     }
-//     async fundAccount(fundAmount) {
-//         await reach.fundFromFaucet(this.state.acc, reach.parseCurrency(fundAmount));
-//         this.setState({ view: 'OwnerAuctioneerOrBidder' });
-//     }
-//     async skipFundAccount() { this.setState({ view: 'OwnerAuctioneerOrBidder' }); }
-//     selectOwner() { this.setState({ view: 'Wrapper', ContentView: Owner }); }
-//     selectAuctioneer() { this.setState({ view: 'Wrapper', ContentView: Auctioneer }); }
-//     selectBidder() { this.setState({ view: 'Wrapper', ContentView: Bidder }); }
-//     render() { return renderView(this, AppViews); }
-// }
-
-
 const App = (props) => {
 
-    const [state, setState] = useState({ view: "Welcome", ...defaults });
+    const [view, setView] = useState("Welcome");
+    const [account, setAccount] = useState(null);
+    const [balance, setBalance] = useState(null);
+
 
     const createAccount = async (acc) => {
         const balAtomic = await reach.balanceOf(acc);
-        const bal = reach.formatCurrency(balAtomic, 4);
-        setState({ ...state, acc, bal });
+        const bal = reach.formatCurrency(balAtomic);
+        setAccount(acc);
+        setBalance(bal);
         if (await reach.canFundFromFaucet()) {
-            setState({ ...state, view: "FundAccount" });
+            setView("FundAccount");
         } else {
-            setState({ ...state, view: "OwnerAuctioneerOrBidder" });
+            setView("OwnerAuctioneerOrBidder");
         }
     }
     const createTestAccount = async () => {
@@ -68,47 +34,50 @@ const App = (props) => {
         createAccount(acc);
     }
     const typeAccountSecret = async () => {
-        setState({ ...state, view: "TypeAccountSecret" });
+        setView("TypeAccountSecret");
     }
     const createAccountFromSecret = async (secret) => {
         const acc = await reach.newAccountFromSecret(secret);
         createAccount(acc);
     }
     const fundAccount = async (fundAmount) => {
-        await reach.fundFromFaucet(acc, reach.parseCurrency(fundAmount));
-        setState({ ...state, view: "OwnerAuctioneerOrBidder" });
+        await reach.fundFromFaucet(account, reach.parseCurrency(fundAmount));
+        setView("OwnerAuctioneerOrBidder");
     }
     const skipFundAccount = async () => {
-        setState({ ...state, view: "OwnerAuctioneerOrBidder" });
+        setView("OwnerAuctioneerOrBidder");
     }
     const selectOwner = () => {
-        setState({ ...state, view: "Wrapper", ContentView: Owner });
+        setView("Owner");
     }
     const selectAuctioneer = () => {
-        setState({ ...state, view: "Wrapper", ContentView: Auctioneer });
+        setView("Auctioneer");
     }
     const selectBidder = () => {
-        setState({ ...state, view: "Wrapper", ContentView: Bidder });
+        setView("Bidder");
     }
 
-    const parent = {
-        state,
-        props: props,
-        createTestAccount,
-        typeAccountSecret,
-        createAccountFromSecret,
-        fundAccount,
-        skipFundAccount,
-        selectOwner,
-        selectAuctioneer,
-        selectBidder
-    }
 
-    return (
-        <div>
-            {renderView(parent, AppViews)}
-        </div>
-    )
+    switch (view) {
+        case 'Welcome':
+            return <Wrapper content={<Welcome parent={{ createTestAccount, typeAccountSecret }} />} />
+        case 'TypeAccountSecret':
+            return <Wrapper content={<TypeAccountSecret parent={{ createAccountFromSecret }} />} />
+        case 'FundAccount':
+            return <Wrapper content={<FundAccount parent={{ fundAccount, skipFundAccount }} bal={balance} standardUnit={defaults.standardUnit} defaultFundAmt={defaults.defaultFundAmt} />} />
+        case 'OwnerAuctioneerOrBidder':
+            return <Wrapper content={<OwnerAuctioneerOrBidder parent={{ selectOwner, selectAuctioneer, selectBidder }} />} />
+        case 'Owner':
+            return <Wrapper content={<Owner acc={account} />} />
+        case 'Auctioneer':
+            return <Wrapper content={<Auctioneer acc={account} />} />
+        case 'Bidder':
+            return <Wrapper content={<Bidder acc={account} />} />
+        default:
+            return (
+                <div></div>
+            );
+    }
 }
 
 renderDOM(<App />);

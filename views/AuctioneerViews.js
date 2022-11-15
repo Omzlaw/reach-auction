@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
-const exports = {};
-
-exports.Wrapper = (props) => {
+export const Wrapper = (props) => {
   const { content } = props;
   return (
     <div className="Auctioneer">
@@ -12,7 +10,7 @@ exports.Wrapper = (props) => {
   );
 }
 
-exports.Attach = (props) => {
+export const Attach = (props) => {
 
   const [state, setState] = useState();
   const { parent } = props;
@@ -44,7 +42,7 @@ exports.Attach = (props) => {
   );
 }
 
-exports.Attaching = () => {
+export const Attaching = () => {
   return (
     <div>
       Attaching, please wait...
@@ -52,7 +50,7 @@ exports.Attaching = () => {
   );
 }
 
-exports.SetMinimumPrice = (props) => {
+export const SetMinimumPrice = (props) => {
 
   const [state, setState] = useState();
   const { parent, defaultMinPrice, standardUnit } = props;
@@ -81,7 +79,7 @@ exports.SetMinimumPrice = (props) => {
   );
 }
 
-exports.SetMinimumBidDiff = (props) => {
+export const SetMinimumBidDiff = (props) => {
 
   const [state, setState] = useState();
   const { parent, defaultMinBidDiff, standardUnit } = props;
@@ -111,7 +109,7 @@ exports.SetMinimumBidDiff = (props) => {
 }
 
 
-exports.SetAuctionLength = (props) => {
+export const SetAuctionLength = (props) => {
 
   const [state, setState] = useState();
   const { parent } = props;
@@ -140,7 +138,7 @@ exports.SetAuctionLength = (props) => {
   );
 }
 
-exports.StartingAuction = () => {
+export const StartingAuction = () => {
   return (
     <div>
       Starting Auction...
@@ -149,7 +147,7 @@ exports.StartingAuction = () => {
 }
 
 
-exports.WaitingForBidders = () => {
+export const WaitingForBidders = () => {
 
   return (
     <div>
@@ -158,7 +156,7 @@ exports.WaitingForBidders = () => {
   )
 }
 
-exports.SeeBid = (props) => {
+export const SeeBid = (props) => {
   const { who, amt, standardUnit } = props;
   return (
     <div>
@@ -170,7 +168,7 @@ exports.SeeBid = (props) => {
 }
 
 
-exports.ShowOutcome = (props) => {
+export const ShowOutcome = (props) => {
   const { winner, amt, standardUnit, parent } = props;
   return (
     <div>
@@ -184,5 +182,3 @@ exports.ShowOutcome = (props) => {
     </div>
   );
 }
-
-export default exports;

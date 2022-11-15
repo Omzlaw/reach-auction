@@ -1,63 +1,36 @@
 import React, { useState } from 'react';
-import AuctioneerViews from '../views/AuctioneerViews';
-import { renderView } from '../views/render';
+import {
+    Wrapper, Attach, WaitingForBidders, SetMinimumPrice, Attaching, SetMinimumBidDiff, SetAuctionLength, StartingAuction, SeeBid, ShowOutcome
+} from '../views/AuctioneerViews';
 import * as backend from '../build/index.main.mjs';
 import { loadStdlib } from '@reach-sh/stdlib';
 const reach = loadStdlib(process.env);
 const { standardUnit } = reach;
 
-// class Auctioneer extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = { view: 'Attach' };
-//     }
-//     async attach(ctcInfoStr) {
-//         const { acc } = this.props;
-//         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
-//         this.setState({ view: 'Attaching' });
-//         this.setState({ view: 'SetMinimumPrice', standardUnit, ctc });
-//     }
-//     setMinimumPrice(minPrice) { this.setState({ view: 'SetMinimumBidDiff', minPrice }); }
-//     setMinimumBidDiff(minBidDiff) { this.setState({ view: 'SetAuctionLength', minBidDiff }); }
-//     setAuctionLength(lengthInBlocks) { 
-//         this.setState({ view: 'StartingAuction', lengthInBlocks }); 
-//         backend.Auctioneer(this.state.ctc, this);
-//     }
-//     async startAuction() {
-//         const { minPrice, minBidDiff, lengthInBlocks } = this.state;
-//         const auctionParams = { minPrice: Number(minPrice), minBidDiff: Number(minBidDiff), lengthInBlocks };
-//         this.setState({ view: 'WaitingForBidders' });
-//         return auctionParams;
-//     }
-//     seeBid(who, amt) {
-//         { this.setState({ view: 'SeeBid', standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
-//     }
-//     showOutcome(winner, amt) {
-//         this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
-//     }
-//     restart() {
-//         this.setState(null);
-//         this.setState({ view: 'Attach' });
-//     }
-
-//     render() { return renderView(this, AuctioneerViews); }
-// }
-
-
 const Auctioneer = (props) => {
-    const [state, setState] = useState();
+    const [view, setView] = useState("Attach");
+    const [who, setWho] = useState(null);
+    const [amt, setAmt] = useState(null);
+    const [winner, setWinner] = useState(null);
+    const [ctc, setCtc] = useState(null);
+    const [minPrice, setMinPrice] = useState(1);
+    const [minBidDiff, setMinBidDiff] = useState(1);
+    const [lengthInBlocks, setLengthInBlocks] = useState(10);
 
     const startAuction = async () => {
-        const { minPrice, minBidDiff, lengthInBlocks } = state;
-        const auctionParams = { minPrice: Number(minPrice), minBidDiff: Number(minBidDiff), lengthInBlocks };
-        setState({ ...state, view: 'WaitingForBidders' });
+        const auctionParams = { minPrice: Number(minPrice), minBidDiff: Number(minBidDiff), lengthInBlocks: Number(lengthInBlocks) };
+        setView("WaitingForBidders");
         return auctionParams;
     }
     const seeBid = (who, amt) => {
-        { setState({ ...state, view: 'SeeBid', standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
+        setView("SeeBid");
+        setWho(reach.formatAddress(who));
+        setAmt(reach.formatCurrency(amt));
     }
     const showOutcome = (winner, amt) => {
-        setState({ ...state, view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt) });
+        setView("ShowOutcome");
+        setWinner(reach.formatAddress(winner));
+        setAmt(reach.formatCurrency(amt));
     }
 
     const interactObjects = {
@@ -69,38 +42,57 @@ const Auctioneer = (props) => {
     const attach = (ctcInfoStr) => {
         const { acc } = props;
         const ctc = acc.contract(backend, JSON.parse(ctcInfoStr));
-        setState({ ...state, view: 'Attaching' });
-        setState({ ...state, view: 'SetMinimumPrice', standardUnit, ctc });
+        setView("Attaching");
+        setView("SetMinimumPrice");
+        setCtc(ctc);
     }
 
-    const setMinimumPrice = (minPrice) => { setState({ ...state, view: 'SetMinimumBidDiff', minPrice }); }
+    const setMinimumPrice = (minPrice) => {
+        setView("SetMinimumBidDiff");
+        setMinPrice(minPrice);
+    }
 
-    const setMinimumBidDiff = (minBidDiff) => { setState({ ...state, view: 'SetAuctionLength', minBidDiff }); }
+    const setMinimumBidDiff = (minBidDiff) => {
+        setView("SetAuctionLength");
+        setMinBidDiff(minBidDiff);
+    }
 
     const setAuctionLength = (lengthInBlocks) => {
-        setState({ ...state, view: 'StartingAuction', lengthInBlocks });
-        backend.Auctioneer(state.ctc, { ...interactObjects });
+        setView("StartingAuction");
+        setLengthInBlocks(lengthInBlocks);
+        backend.Auctioneer(ctc, { ...interactObjects });
     }
 
     const restart = () => {
-        setState({ view: 'Attach' });
+        setView("Attach");
     }
 
-    const parent = {
-        state,
-        props: props,
-        attach,
-        setMinimumPrice,
-        setMinimumBidDiff,
-        setAuctionLength,
-        restart
+    switch (view) {
+        case 'Attach':
+            return <Wrapper content={<Attach parent={{ attach }} />} />
+        case 'WaitingForBidders':
+            return <Wrapper content={<WaitingForBidders />} />
+        case 'Attaching':
+            return <Wrapper content={<Attaching />} />
+        case 'SetMinimumPrice':
+            return <Wrapper content={<SetMinimumPrice parent={{ setMinimumPrice }} defaultMinPrice={1} standardUnit={standardUnit} />} />
+        case 'SetMinimumBidDiff':
+            return <Wrapper content={<SetMinimumBidDiff parent={{ setMinimumBidDiff }} defaultMinBidDiff={1} standardUnit={standardUnit} />} />
+        case 'SetAuctionLength':
+            return <Wrapper content={<SetAuctionLength parent={{ setAuctionLength }} />} />
+        case 'StartingAuction':
+            return <Wrapper content={<StartingAuction />} />
+        case 'SeeBid':
+            return <Wrapper content={<SeeBid who={who} amt={amt} standardUnit={standardUnit} />} />
+        case 'WaitingForAuctionToStart':
+            return <Wrapper content={<WaitingForAuctionToStart ctcInfoStr={ctcInfoStr} nftId={nftID} />} />
+        case 'ShowOutcome':
+            return <Wrapper content={<ShowOutcome parent={{ restart }} winner={winner} amt={amt} standardUnit={standardUnit} />} />
+        default:
+            return (
+                <div></div>
+            );
     }
-
-    return (
-        <div>
-            {renderView(parent, AuctioneerViews)}
-        </div>
-    )
 }
 
 export default Auctioneer;

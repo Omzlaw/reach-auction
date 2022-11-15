@@ -1,69 +1,40 @@
 import React, { useState } from 'react';
-import OwnerViews from '../views/OwnerViews';
-import { renderView } from '../views/render';
+import { Wrapper, SetNFT, SeeBid, ShowOutcome, Deploy, WaitingForAuctionToStart } from '../views/OwnerViews';
 import * as backend from '../build/index.main.mjs';
 import { loadStdlib } from '@reach-sh/stdlib';
 const reach = loadStdlib(process.env);
 const { standardUnit } = reach;
 
-// class Owner extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = { view: 'SetNFT' };
-//     }
-//     setMyNFT(nftId) { this.setState({ view: 'Deploy', nftId }); }
-//     async setDemoNFT() {
-//         const NFT = await reach.launchToken(this.props.acc, "Omz", "NFT", { supply: 1 });
-//         this.setState({ view: 'Deploy', nftId: NFT.id })
-//     }
-//     async setNFT() {
-//         const nftId = this.state.nftId;
-//         return { nftId };
-//     }
-//     async deploy() {
-//         const ctc = this.props.acc.contract(backend);
-//         this.setState({ view: 'Deploying', ctc });
-//         backend.Owner(ctc, this);
-//         const ctcInfoStr = JSON.stringify(await ctc.getInfo(), null, 2);
-//         const nftId = JSON.stringify(this.state.nftId);
-//         this.setState({ view: 'WaitingForAuctionToStart', ctcInfoStr, nftId });
-//     }
-//     seeBid(who, amt) {
-//         { this.setState({ view: 'SeeBid', standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) }); }
-//     }
-//     async showOutcome(winner, amt) {
-//         const balance = await this.getBalance();
-//         const amtNFT = await this.getNFTBalance(this.state.nftId);
-//         this.setState({ view: 'ShowOutcome', standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt), balance, amtNFT });
-//     }
-//     async getBalance() {
-//         return reach.formatCurrency(await reach.balanceOf(this.props.acc));
-//     }
-//     async getNFTBalance(nftId) {
-//         return await this.props.acc.balanceOf(JSON.parse(nftId));
-//     }
-//     restart() {
-//         this.setState(null);
-//         this.setState({ view: 'SetNFT' });
-//     }
-
-//     render() { return renderView(this, OwnerViews); }
-// }
 
 const Owner = (props) => {
-    const [state, setState] = useState(null);
+    const { acc } = props;
+    const [view, setView] = useState("SetNFT");
+    const [who, setWho] = useState(null);
+    const [amt, setAmt] = useState(null);
+    const [amtNFT, setAmtNFT] = useState(null);
+    const [winner, setWinner] = useState(null);
+    const [balance, setBalance] = useState(null);
+    const [nftID, setNFTID] = useState(null);
+    const [ctc, setCtc] = useState(null);
+    const [ctcInfoStr, setCtcInfoStr] = useState(null);
 
     const setNFT = () => {
-        const nftId = state.nftId;
+        const nftId = nftID;
         return { nftId };
     }
     const seeBid = (who, amt) => {
-        setState({ ...state, view: "SeeBid", standardUnit, who: reach.formatAddress(who), amt: reach.formatCurrency(amt) });
+        setView("SeeBid");
+        setWho(reach.formatAddress(who));
+        setAmt(reach.formatCurrency(amt, 4));
     }
     const showOutcome = async (winner, amt) => {
         const balance = await getBalance();
-        const amtNFT = await getNFTBalance(state.nftId);
-        setState({ ...state, view: "ShowOutcome", standardUnit, winner: reach.formatAddress(winner), amt: reach.formatCurrency(amt), balance: balance, amtNFT: amtNFT });
+        const amtNFT = await getNFTBalance(nftID);
+        setView("ShowOutcome");
+        setWinner(reach.formatAddress(winner));
+        setAmt(reach.formatCurrency(amt));
+        setBalance(balance)
+        setAmtNFT(amtNFT);
     }
 
     const interactObjects = {
@@ -73,49 +44,55 @@ const Owner = (props) => {
     }
 
     const setMyNFT = (nftId) => {
-        setState({ ...state, view: "Deploy", nftId: nftId });
+        setView("Deploy");
+        setNFTID(nftId);
     }
     const setDemoNFT = async () => {
-        const NFT = await reach.launchToken(props.acc, "Omz", "NFT", { supply: 1 });
-        setState({ ...state, view: "Deploy", nftId: NFT.id });
+        const NFT = await reach.launchToken(acc, "Omz", "NFT", { supply: 1 });
+        setView("Deploy");
+        setNFTID(NFT.id);
     }
 
     const deploy = async () => {
-        const ctc = props.acc.contract(backend);
-        setState({ ...state, view: "Deploy", ctc: ctc });
+        const ctc = acc.contract(backend);
+        setView("Deploy");
+        setCtc(ctc);
         backend.Owner(ctc, { ...interactObjects });
         const ctcInfoStr = JSON.stringify(await ctc.getInfo(), null, 2);
-        const nftId = JSON.stringify(nftId);
-        setState({ ...state, view: "WaitingForAuctionToStart", nftId: NFT.id, ctcInfoStr: ctcInfoStr });
+        const nftId = JSON.stringify(nftID);
+        setView("WaitingForAuctionToStart")
+        setNFTID(nftId);
+        setCtcInfoStr(ctcInfoStr);
     }
     const getBalance = async () => {
-        return reach.formatCurrency(await reach.balanceOf(props.acc));
+        return reach.formatCurrency(await reach.balanceOf(acc));
     }
 
     const getNFTBalance = async (nftId) => {
-        return await props.acc.balanceOf(JSON.parse(nftId));
+        return await acc.balanceOf(JSON.parse(nftId));
     }
 
     const restart = () => {
-        setState({ view: "SetNFT" });
+        setView("SetNFT");
     }
 
-    const parent = {
-        state,
-        props: props,
-        setDemoNFT,
-        setMyNFT,
-        deploy,
-        getBalance,
-        getNFTBalance,
-        restart
-    }
 
-    return (
-        <div>
-            {renderView(parent, OwnerViews)}
-        </div>
-    )
+    switch (view) {
+        case 'SetNFT':
+            return <Wrapper content={<SetNFT parent={{ setMyNFT, setDemoNFT }} />} />
+        case 'Deploy':
+            return <Wrapper content={<Deploy parent={{ deploy }} />} />
+        case 'SeeBid':
+            return <Wrapper content={<SeeBid who={who} amt={amt} standardUnit={standardUnit} />} />
+        case 'WaitingForAuctionToStart':
+            return <Wrapper content={<WaitingForAuctionToStart ctcInfoStr={ctcInfoStr} nftId={nftID} />} />
+        case 'ShowOutcome':
+            return <Wrapper content={<ShowOutcome parent={{ restart }} winner={winner} amt={amt} standardUnit={standardUnit} balance={balance} />} />
+        default:
+            return (
+                <div></div>
+            );
+    }
 }
 
 export default Owner;

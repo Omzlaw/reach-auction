@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 
-const exports = {};
-
 // Player views must be extended.
 // It does not have its own Wrapper view.
 
-exports.PlaceBid = (props) => {
+export const PlaceBid = (props) => {
 
   const [state, setState] = useState();
   const {
@@ -49,7 +47,7 @@ exports.PlaceBid = (props) => {
   );
 }
 
-exports.Done = (props) => {
+export const Done = (props) => {
   const { outcome } = props;
   return (
     <div>
@@ -59,7 +57,7 @@ exports.Done = (props) => {
   );
 }
 
-exports.Error = (props) => {
+export const Error = (props) => {
   const { amt, standardUnit, amtNFT } = props;
   return (
     <div>
@@ -69,5 +67,3 @@ exports.Error = (props) => {
     </div>
   );
 }
-
-export default exports;

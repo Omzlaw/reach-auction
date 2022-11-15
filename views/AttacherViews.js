@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import BidderViews from './BidderViews';
 
-const exports = { ...BidderViews };
-
-exports.Wrapper = (props) => {
+export const Wrapper = (props) => {
   const { content } = props;
   return (
     <div className="Attacher">
@@ -13,7 +10,7 @@ exports.Wrapper = (props) => {
   );
 }
 
-exports.Attach = (props) => {
+export const Attach = (props) => {
 
   const [state, setState] = useState();
   const { parent } = props;
@@ -32,7 +29,7 @@ exports.Attach = (props) => {
       <br />
       <textarea spellCheck="false"
         className='ContractInfo'
-        onChange={(e) => setState({ ctcInfoStr: e.currentTarget.value })}
+        onChange={(e) => setState({ ...state, ctcInfoStr: e.currentTarget.value })}
         placeholder=''
       />
       <br />
@@ -40,7 +37,7 @@ exports.Attach = (props) => {
       <br />
       <textarea spellCheck="false"
         className='ContractInfo'
-        onChange={(e) => setState({ nftId: e.currentTarget.value })}
+        onChange={(e) => setState({ ...state, nftId: e.currentTarget.value })}
         placeholder=''
       />
       <br />
@@ -53,13 +50,12 @@ exports.Attach = (props) => {
   );
 }
 
-exports.Attaching = () => {
-    return (
-      <div>
-        Attaching, please wait...
-      </div>
-    );
+export const Attaching = () => {
+  return (
+    <div>
+      Attaching, please wait...
+    </div>
+  );
 }
 
 
-export default exports;
